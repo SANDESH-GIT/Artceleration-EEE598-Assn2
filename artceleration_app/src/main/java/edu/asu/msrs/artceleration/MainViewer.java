@@ -4,8 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,6 +15,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -50,12 +58,29 @@ public class MainViewer extends AppCompatActivity {
         status2 = (TextView) findViewById(R.id.statusText2);
         artview = (ArtView) findViewById(R.id.artView);
 
-        artlib = new ArtLib();
+        artlib = new ArtLib(this);
 
         artlib.registerHandler(new TransformHandler() {
             @Override
             public void onTransformProcessed(Bitmap img_out) {
+                Log.d("fd", "Image received successfully!:"+img_out.getByteCount());
+                File f = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES), "tagImage.jpg");
+                ByteArrayOutputStream stream =  new ByteArrayOutputStream();
+                img_out.compress(Bitmap.CompressFormat.JPEG, 30, stream);
+                BufferedOutputStream outputStream = null;
+                try {
+                    outputStream = new BufferedOutputStream(new FileOutputStream(f));
+                    outputStream.write(stream.toByteArray());
+                    if(outputStream != null){
+                        outputStream.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 artview.setTransBmp(img_out);
+
+
             }
         });
 
