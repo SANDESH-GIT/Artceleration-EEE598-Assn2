@@ -39,7 +39,6 @@ public class ArtLib {
     ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            //Toast.makeText(CameraActivity.this, "Service Connected!", Toast.LENGTH_LONG).show();
             messenger = new Messenger(iBinder);
             isBound = true;
         }
@@ -73,7 +72,7 @@ public class ArtLib {
 
     public void registerHandler(TransformHandler artlistener){
         this.artlistener=artlistener;
-        //listener = new MyTransformHandler(artlistener);
+
     }
 
     public boolean requestTransform(Bitmap img, int index, int[] intArgs, float[] floatArgs){
@@ -81,7 +80,7 @@ public class ArtLib {
         try {
             queue.add(requestNo);
             int size = 0;
-            //listener = new MyTransformHandler((MyTransformHandler)artlistener, index, intArgs, floatArgs, requestNo++);
+
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             img.compress(Bitmap.CompressFormat.JPEG, 100, b);
             Log.d("fd", "size:"+b.size());
@@ -121,7 +120,7 @@ public class ArtLib {
             Log.d("clientSide", "what="+what);
             Bundle data = new Bundle();
             data = msg.getData();
-            ParcelFileDescriptor fd = (ParcelFileDescriptor)data.get("ServicePFD");
+            ParcelFileDescriptor fd = (ParcelFileDescriptor)data.get("ClassPFD");
 
             int size = msg.arg1;
             Log.d("fd", "size:"+size);
@@ -135,7 +134,7 @@ public class ArtLib {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inMutable = true;
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
             final Bitmap bitmap = Bitmap.createBitmap(BitmapFactory.decodeByteArray(b, 0, b.length, options));
 
             final int requestNo = msg.arg2;
@@ -160,7 +159,7 @@ public class ArtLib {
                 }
             });
             t.start();
-            //artlistener.onTransformProcessed(bitmap);
+
         }
     }
 

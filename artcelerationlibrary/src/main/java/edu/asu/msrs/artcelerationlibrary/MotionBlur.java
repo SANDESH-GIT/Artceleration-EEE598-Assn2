@@ -1,43 +1,56 @@
 package edu.asu.msrs.artcelerationlibrary;
 
 import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.os.MemoryFile;
+import android.os.Message;
 import android.os.Messenger;
 import android.os.ParcelFileDescriptor;
+import android.util.Log;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Created by pavilion on 06-11-2016.
  */
 public class MotionBlur implements Runnable {
-    private Bitmap output;
     private Bitmap input;
     private Messenger messenger;
     private int requestNo;
-    private ParcelFileDescriptor fd;
+    private MemoryFile memoryFile;
 
-    MotionBlur(Messenger messenger, Bitmap input, int requestNo, ParcelFileDescriptor fd) {
+
+    MotionBlur(Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile) {
         this.messenger = messenger;
         this.input = input;
         this.requestNo = requestNo;
-        this.fd = fd;
+        this.memoryFile = memoryFile;
     }
 
     @Override
     public void run() {
-        output = input;
         // TODO transform Logic
+        Log.d("fd", "Motion Blur!");
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            input.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            byte[] oparray = outputStream.toByteArray();
+            memoryFile.getOutputStream().write(oparray);
 
-            /*
-            MyTransformHandler m = (MyTransformHandler) (queue.peek());
-            if (m.getRequestNo() == requestNo) {
-                transformHandler.onTransformProcessed(output);
-                queue.poll();
-                break;
-            }
-            */
+            Bundle bundle = new Bundle();
+            Message message = Message.obtain(null, 10, oparray.length, requestNo);
+            ParcelFileDescriptor pfd = MemoryFileUtil.getParcelFileDescriptor(memoryFile);
+            bundle.putParcelable("ClassPFD", pfd);
+            message.setData(bundle);
 
+            messenger.send(message);
+            Thread.sleep(1000,0);
+            memoryFile.allowPurging(true);
+            memoryFile.close();
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }
