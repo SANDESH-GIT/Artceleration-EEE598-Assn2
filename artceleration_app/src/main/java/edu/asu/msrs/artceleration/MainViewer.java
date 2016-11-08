@@ -64,6 +64,9 @@ public class MainViewer extends AppCompatActivity {
             @Override
             public void onTransformProcessed(Bitmap img_out) {
                 Log.d("fd", "Image received successfully!:"+img_out.getByteCount());
+
+                // Saved the file for testing purpose
+                /*
                 File f = new File(Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_PICTURES), "tagImage.jpg");
                 ByteArrayOutputStream stream =  new ByteArrayOutputStream();
@@ -78,6 +81,7 @@ public class MainViewer extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                */
                 artview.setTransBmp(img_out);
 
 

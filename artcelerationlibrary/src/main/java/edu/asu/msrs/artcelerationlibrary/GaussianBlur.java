@@ -1,3 +1,10 @@
+/**
+ * Thread which handles all requests for Gaussian Blur transform.
+ * Parameters: Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile
+ * Sends a message to the handler in Library after processing the image using its Messenger object to
+ * let the library know that the processed Bitmap output image is ready.
+ */
+
 package edu.asu.msrs.artcelerationlibrary;
 
 import android.graphics.Bitmap;
@@ -11,9 +18,7 @@ import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 
-/**
- * Created by pavilion on 06-11-2016.
- */
+
 public class GaussianBlur implements Runnable {
     private Bitmap input;
     private Messenger messenger;
@@ -28,6 +33,12 @@ public class GaussianBlur implements Runnable {
         this.memoryFile = memoryFile;
     }
 
+
+    /**
+     * Run method includes all the transform logic for processing the input Bitmap image.
+     * Writes the output image to the Memory File and shares the file descriptor of this file
+     * with the library.
+     */
     @Override
     public void run() {
         // TODO transform Logic

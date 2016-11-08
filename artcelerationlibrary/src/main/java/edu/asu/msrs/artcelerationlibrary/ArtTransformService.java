@@ -1,3 +1,9 @@
+/**
+ * Bounded Service to which the library binds.
+ * Library uses this service for each transform request made by the application.
+ * Acts as a multithreaded server by creating a new thread for each request.
+ */
+
 package edu.asu.msrs.artcelerationlibrary;
 
 import android.app.Service;
@@ -21,6 +27,7 @@ public class ArtTransformService extends Service {
     public ArtTransformService() {
     }
 
+    // Handles messages sent by the library
     class ArtTransformHandler extends Handler{
         @Override
         public void handleMessage(Message msg) {
@@ -33,6 +40,8 @@ public class ArtTransformService extends Service {
             int size = msg.arg1;
             int requestNo = msg.arg2;
             Log.d("fd", "size:"+size);
+
+            // To read the input bitmap image written to the Memory File in the library.
             ParcelFileDescriptor.AutoCloseInputStream isr = new ParcelFileDescriptor.AutoCloseInputStream(fd);
             byte[] b = new byte[size];
             try {
@@ -48,6 +57,7 @@ public class ArtTransformService extends Service {
             Bitmap bitmap = Bitmap.createBitmap(BitmapFactory.decodeByteArray(b, 0, b.length, options));
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
 
+            // Creates a new Memory File for every request and is passed to Thread which write to it after processing is done.
             MemoryFile serviceMemFile = null;
             try {
                 serviceMemFile = new MemoryFile("MyMemFile", bitmap.getByteCount());
@@ -55,6 +65,7 @@ public class ArtTransformService extends Service {
                 e.printStackTrace();
             }
 
+            // Creates a new thread depending on the what parameter of the message received by library which specifies the Transform type
             switch (type){
                 case 0:
                     Thread t = new Thread(new GaussianBlur(m, bitmap,requestNo, serviceMemFile));
@@ -82,8 +93,10 @@ public class ArtTransformService extends Service {
         }
     }
 
+    // Messenger object pointing to ArtTransformHandler
     final Messenger m = new Messenger(new ArtTransformHandler());
 
+    // Called when library invokes the bindService method which returns a binder.
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
