@@ -44,7 +44,7 @@ public class SobelEdgeFilter implements Runnable {
             message.setData(bundle);
 
             messenger.send(message);
-            Thread.sleep(1000,0);
+            //Thread.sleep(1000,0);
             memoryFile.allowPurging(true);
             memoryFile.close();
 

@@ -125,27 +125,29 @@ public class ArtLib {
             int size = msg.arg1;
             Log.d("fd", "size:"+size);
             ParcelFileDescriptor.AutoCloseInputStream isr = new ParcelFileDescriptor.AutoCloseInputStream(fd);
-            byte[] b = new byte[size];
+            final byte[] b = new byte[size];
             try {
                 isr.read(b);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            BitmapFactory.Options options = new BitmapFactory.Options();
+            final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inMutable = true;
-
-
-            final Bitmap bitmap = Bitmap.createBitmap(BitmapFactory.decodeByteArray(b, 0, b.length, options));
-
             final int requestNo = msg.arg2;
+            Log.d("fd", "outside requestNo:"+requestNo);
+            //final Bitmap bitmap = Bitmap.createBitmap(BitmapFactory.decodeByteArray(b, 0, b.length, options));
+
+            //final
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int rqNo = (int)queue.peek();
-                    Log.d("fd", "rqNo:"+rqNo);
-                    Log.d("fd", "requestNo:"+requestNo);
+                    Bitmap bitmap = Bitmap.createBitmap(BitmapFactory.decodeByteArray(b, 0, b.length, options));
+
+                    int requestNumber = requestNo;
+                    Log.d("fd", "requestNo:"+requestNumber);
                     while(true){
-                        if (rqNo == requestNo) {
+                        int rqNo = (int)queue.peek();
+                        if (rqNo == requestNumber) {
                             artlistener.onTransformProcessed(bitmap);
                             queue.poll();
                             break;
