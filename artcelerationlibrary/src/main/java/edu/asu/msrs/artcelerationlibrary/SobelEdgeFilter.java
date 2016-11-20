@@ -64,7 +64,7 @@ public class SobelEdgeFilter implements Runnable {
         Bitmap grayScale = Bitmap.createBitmap(w,h,input.getConfig());
 
         // Image represented by 4-bytes (4 channels as A,R, G, B)
-        int a, r, g, b;
+        int r, g, b;
         int pix;
 
         for(int i=0; i< w; i++){
@@ -72,14 +72,11 @@ public class SobelEdgeFilter implements Runnable {
                 pix=input.getPixel(i,j); // getPixel returns an integer value of the color of pixel
 
                 // Filtering for every channel a,r,g,b
-                a= Color.alpha(pix);
-
-                // TODO: red, green, blue parameter needed from scroll down menu (either float array or integer array)
                 r=(int)(Color.red(pix)* 0.2989);
                 g=(int)(Color.green(pix)* 0.5870);
                 b=(int)(Color.blue(pix)* 0.1140);
 
-                grayScale.setPixel(i,j,Color.argb(a,r,g,b));
+                grayScale.setPixel(i,j,Color.argb(255,r,g,b));
             }
         }
 

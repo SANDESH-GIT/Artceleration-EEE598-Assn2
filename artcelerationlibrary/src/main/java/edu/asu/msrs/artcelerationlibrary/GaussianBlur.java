@@ -45,8 +45,8 @@ public class GaussianBlur implements Runnable {
         // TODO transform Logic
         Log.d("fd", "Gaussian Blur!");
 
-        int rad = 1;
-        float sd = 0.1f;
+        int rad = 5;
+        float sd = 3.0f;
         int size = 2*rad+1;
 
         // Image size, w-> width & h->height
