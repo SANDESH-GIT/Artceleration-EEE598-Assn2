@@ -80,6 +80,7 @@ public class MotionBlur implements Runnable {
                     output.setPixel(i, j, Color.argb(255, Pr[i][j], Pg[i][j], Pb[i][j]));
                 }
             }
+
         }else if (a0==1){
             for (int i = 0; i < w; i++) {
                 for (int j = 0; j < h; j++) {
