@@ -9,6 +9,7 @@ package edu.asu.msrs.artcelerationlibrary;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.MemoryFile;
 import android.os.Message;
@@ -43,9 +44,65 @@ public class GaussianBlur implements Runnable {
     public void run() {
         // TODO transform Logic
         Log.d("fd", "Gaussian Blur!");
+
+        int rad = 1;
+        float sd = 0.1f;
+        int size = 2*rad+1;
+
+        // Image size, w-> width & h->height
+        int w = input.getWidth();
+        int h = input.getHeight();
+
+        // Creating bitmap to be returned as a modified (mutable output bitmap)
+        Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
+
+        double[] G = new double[size];
+        double[][] qr = new double[w][h];
+        double[][] qg = new double[w][h];
+        double[][] qb = new double[w][h];
+        int[][] Pr = new int[w][h];
+        int[][] Pg = new int[w][h];
+        int[][] Pb = new int[w][h];
+
+        for(int i=0; i<size; i++){
+            G[i]= (Math.exp(-(Math.pow(i-rad,2))/(2*Math.pow(sd,2)))/Math.sqrt(2*(Math.PI)*sd*sd));
+            Log.d("Gaussian Blur: ", "Calculating kernel"+G[i]);
+        }
+
+        for (int i=0;i<w;i++) {
+            for (int j = 0; j < h; j++) {
+                for (int k=0;k<size;k++) {
+                    int xval = i-rad+k;
+                    if(!(xval<0 || xval>=w)){
+                        qr[i][j] += G[k] * Color.red(input.getPixel(xval,j));
+                        qg[i][j] += G[k] * Color.green(input.getPixel(xval,j));
+                        qb[i][j] += G[k] * Color.blue(input.getPixel(xval,j));
+                    }
+                }
+            }
+        }
+
+        for (int i=0;i<w;i++) {
+            for (int j = 0; j < h; j++) {
+                for (int k=0;k<size;k++) {
+                    int yval = j-rad+k;
+                    if(!(yval<0 || yval>=h)){
+                        Pr[i][j] += G[k] * qr[i][yval];
+                        Pg[i][j] += G[k] * qg[i][yval];
+                        Pb[i][j] += G[k] * qb[i][yval];
+
+                        output.setPixel(i,j,Color.argb(255,Pr[i][j],Pg[i][j],Pb[i][j]));
+                        //Log.d("Gaussian Blur","One pixel modified");
+                    }
+                }
+            }
+        }
+
+        Log.d("Gaussian Blur","Done processing...!!!");
+
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            input.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            output.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             byte[] oparray = outputStream.toByteArray();
             memoryFile.getOutputStream().write(oparray);
 

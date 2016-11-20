@@ -9,6 +9,7 @@ package edu.asu.msrs.artcelerationlibrary;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.MemoryFile;
 import android.os.Message;
@@ -43,9 +44,83 @@ public class SobelEdgeFilter implements Runnable {
     public void run() {
         // TODO transform Logic
         Log.d("fd", "Gaussian Blur!");
+
+        int a0=0; // Grx
+        a0 = 1; // Gry
+        a0 = 2;
+        //vertical edge filter
+        int[][] sx=new int[][]{{-1,0,1}, {-2,0,2}, {-1,0,1}} ;
+
+        // horizontal edge filter
+        int[][] sy=new int[][]{{-1,-2,1}, {0,0,0}, {1,2,1}} ;
+
+        // Image size, w-> width & h->height
+        int w = input.getWidth();
+        int h = input.getHeight();
+
+        // Creating bitmap to be returned as a modified (mutable output bitmap)
+        Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
+        Bitmap grayScale = Bitmap.createBitmap(w,h,input.getConfig());
+
+        // Image represented by 4-bytes (4 channels as A,R, G, B)
+        int a, r, g, b;
+        int pix;
+
+        for(int i=0; i< w; i++){
+            for(int j=0; j<h; j++){
+                pix=input.getPixel(i,j); // getPixel returns an integer value of the color of pixel
+
+                // Filtering for every channel a,r,g,b
+                a= Color.alpha(pix);
+
+                // TODO: red, green, blue parameter needed from scroll down menu (either float array or integer array)
+                r=(int)(Color.red(pix)* 0.2989);
+                g=(int)(Color.green(pix)* 0.5870);
+                b=(int)(Color.blue(pix)* 0.1140);
+
+                grayScale.setPixel(i,j,Color.argb(a,r,g,b));
+            }
+        }
+
+        if (a0==0){
+            int[][]Grx=new int[w][h];
+            for (int i=1;i<w-1;i++) {
+                for (int j = 1; j < h-1; j++) {
+
+                    Grx[i][j] = sx[0][0]*grayScale.getPixel(i-1, j-1) + sx[1][0]*grayScale.getPixel(i, j-1) + sx[2][0]*grayScale.getPixel(i+1, j-1)
+                            + sx[0][1]*grayScale.getPixel(i-1, j) + sx[1][1]*grayScale.getPixel(i, j) + sx[2][1]*grayScale.getPixel(i+1, j)
+                            + sx[0][2]*grayScale.getPixel(i-1, j+1) + sx[1][2]*grayScale.getPixel(i, j+1) + sx[2][2]*grayScale.getPixel(i+1, j+1);
+
+
+
+                    output.setPixel(i, j , Color.argb(255, Grx[i][j], Grx[i][j], Grx[i][j]));
+                }
+            }
+        }else if (a0 == 2){
+            int[][]Grx=new int[w][h];
+            int[][]Gry=new int[w][h];
+            for (int i=1;i<w-1;i++) {
+                for (int j = 1; j < h-1; j++) {
+
+                    Grx[i][j] = sx[0][0]*grayScale.getPixel(i-1, j-1) + sx[1][0]*grayScale.getPixel(i, j-1) + sx[2][0]*grayScale.getPixel(i+1, j-1)
+                            + sx[0][1]*grayScale.getPixel(i-1, j) + sx[1][1]*grayScale.getPixel(i, j) + sx[2][1]*grayScale.getPixel(i+1, j)
+                            + sx[0][2]*grayScale.getPixel(i-1, j+1) + sx[1][2]*grayScale.getPixel(i, j+1) + sx[2][2]*grayScale.getPixel(i+1, j+1);
+
+                    Gry[i][j] = sy[0][0]*grayScale.getPixel(i-1, j-1) + sy[1][0]*grayScale.getPixel(i, j-1) + sy[2][0]*grayScale.getPixel(i+1, j-1)
+                            + sy[0][1]*grayScale.getPixel(i-1, j) + sy[1][1]*grayScale.getPixel(i, j) + sy[2][1]*grayScale.getPixel(i+1, j)
+                            + sy[0][2]*grayScale.getPixel(i-1, j+1) + sy[1][2]*grayScale.getPixel(i, j+1) + sy[2][2]*grayScale.getPixel(i+1, j+1);
+
+                    int Gr = (int) Math.sqrt(Grx[i][j]*Grx[i][j] + Gry[i][j]*Gry[i][j]);
+
+                    output.setPixel(i, j , Color.argb(255, Gr, Gr, Gr));
+                }
+            }
+        }
+
+
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            input.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            output.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             byte[] oparray = outputStream.toByteArray();
             memoryFile.getOutputStream().write(oparray);
 

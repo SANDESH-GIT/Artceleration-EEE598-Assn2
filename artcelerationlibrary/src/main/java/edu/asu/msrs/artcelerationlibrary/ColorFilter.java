@@ -9,6 +9,7 @@ package edu.asu.msrs.artcelerationlibrary;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.MemoryFile;
 import android.os.Message;
@@ -42,7 +43,38 @@ public class ColorFilter implements Runnable {
     @Override
     public void run() {
         // TODO transform Logic
-        Log.d("fd", "Gaussian Blur!");
+        Log.d("fd", "Color Filter!");
+
+        // Image size, w-> width & h->height
+        int w = input.getWidth();
+        int h = input.getHeight();
+
+        // Creating bitmap to be returned as a modified (mutable output bitmap)
+        Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
+
+        // Image represented by 4-bytes (4 channels as A,R, G, B)
+        int a, r, g, b;
+        int pix;
+
+        // Iterate over all pixels
+        for(int i=0; i< w; i++){
+            for(int j=0; j<h; j++){
+                pix=input.getPixel(i,j); // getPixel returns an integer value of the color of pixel
+
+                // Filtering for every channel a,r,g,b
+                a= Color.alpha(pix);
+
+                // TODO: red, green, blue parameter needed from scroll down menu (either float array or integer array)
+                r=(int)(Color.red(pix)* 0.5);
+                g=(int)(Color.green(pix)* 0.6);
+                b=(int)(Color.blue(pix)* 0.3);
+
+                output.setPixel(i,j,Color.argb(a,r,g,b));
+            }
+        }
+
+        input = output; //Writing back modified image to input image
+
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             input.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
