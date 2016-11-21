@@ -68,7 +68,7 @@ public class ArtTransformService extends Service {
             // Creates a new thread depending on the what parameter of the message received by library which specifies the Transform type
             switch (type){
                 case 0:
-                    Thread t = new Thread(new GaussianBlur(m, bitmap,requestNo, serviceMemFile));
+                    Thread t = new Thread(new UnsharpMask(m, bitmap,requestNo, serviceMemFile));
                     t.start();
                     break;
                 case 1:

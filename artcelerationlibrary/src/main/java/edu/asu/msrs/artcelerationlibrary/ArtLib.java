@@ -73,7 +73,7 @@ public class ArtLib {
 
     // List of transform options
     public String[] getTransformsArray(){
-        String[] transforms = {"Gaussian Blur", "Neon edges", "Color Filter", "Sobel Edge Filter", "Motion Blur"};
+        String[] transforms = {"Unsharp Mask", "Neon edges", "Color Filter", "Sobel Edge Filter", "Motion Blur"};
         return transforms;
     }
 

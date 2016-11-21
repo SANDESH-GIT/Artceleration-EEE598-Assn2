@@ -43,11 +43,11 @@ public class SobelEdgeFilter implements Runnable {
     @Override
     public void run() {
         // TODO transform Logic
-        Log.d("fd", "Gaussian Blur!");
+        Log.d("fd", "SobelEdge Filter!");
 
         int a0=0; // Grx
-        a0 = 1; // Gry
-        a0 = 2; // Overall gradient
+        //a0 = 1; // Gry
+        //a0 = 2; // Overall gradient
 
         //vertical edge filter
         int[][] sx=new int[][]{{-1,0,1}, {-2,0,2}, {-1,0,1}} ;

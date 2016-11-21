@@ -46,7 +46,7 @@ public class GaussianBlur implements Runnable {
         Log.d("fd", "Gaussian Blur!");
 
         int rad = 5;
-        float sd = 3.0f;
+        float sd = 2f;
         int size = 2*rad+1;
 
         // Image size, w-> width & h->height
@@ -90,11 +90,10 @@ public class GaussianBlur implements Runnable {
                         Pr[i][j] += G[k] * qr[i][yval];
                         Pg[i][j] += G[k] * qg[i][yval];
                         Pb[i][j] += G[k] * qb[i][yval];
-
-                        output.setPixel(i,j,Color.argb(255,Pr[i][j],Pg[i][j],Pb[i][j]));
                         //Log.d("Gaussian Blur","One pixel modified");
                     }
                 }
+                output.setPixel(i,j,Color.argb(255,Pr[i][j],Pg[i][j],Pb[i][j]));
             }
         }
 
