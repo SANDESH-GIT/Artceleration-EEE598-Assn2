@@ -65,7 +65,7 @@ public class UnsharpMask implements Runnable {
         int[][] Pr = new int[w][h];
         int[][] Pg = new int[w][h];
         int[][] Pb = new int[w][h];
-
+/*
         for(int i=0; i<size; i++){
             G[i]= (Math.exp(-(Math.pow(i-rad,2))/(2*Math.pow(sd,2)))/Math.sqrt(2*(Math.PI)*sd*sd));
             //Log.d("Unsharp,Gaussian Blur: ", "Calculating kernel"+G[i]);
@@ -101,8 +101,8 @@ public class UnsharpMask implements Runnable {
                 output.setPixel(i,j,Color.argb(255,Pr[i][j],Pg[i][j],Pb[i][j]));
             }
         }
-
-
+*/
+        //TODO: Should return null if arguments passed are not proper
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

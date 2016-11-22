@@ -47,7 +47,7 @@ public class SobelEdgeFilter implements Runnable {
 
         int a0=0; // Grx
         //a0 = 1; // Gry
-        //a0 = 2; // Overall gradient
+        a0 = 2; // Overall gradient
 
         //vertical edge filter
         int[][] sx=new int[][]{{-1,0,1}, {-2,0,2}, {-1,0,1}} ;
@@ -152,7 +152,7 @@ public class SobelEdgeFilter implements Runnable {
                 }
             }
         }else{
-            output=input;
+            output=input; //TODO: Should return null as per assignment change
         }
 
         try {

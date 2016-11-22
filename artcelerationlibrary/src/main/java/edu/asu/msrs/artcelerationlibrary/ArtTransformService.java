@@ -72,7 +72,7 @@ public class ArtTransformService extends Service {
                     t.start();
                     break;
                 case 1:
-                    Thread t1 = new Thread(new NeonEdges(m, bitmap,requestNo, serviceMemFile));
+                    Thread t1 = new Thread(new GaussianBlur(m, bitmap,requestNo, serviceMemFile));
                     t1.start();
                     break;
                 case 2:

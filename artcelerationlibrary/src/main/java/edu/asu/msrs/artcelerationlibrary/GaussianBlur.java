@@ -96,6 +96,7 @@ public class GaussianBlur implements Runnable {
                 output.setPixel(i,j,Color.argb(255,Pr[i][j],Pg[i][j],Pb[i][j]));
             }
         }
+        //TODO: Should return null if arguments passed are not proper
 
         Log.d("Gaussian Blur","Done processing...!!!");
 

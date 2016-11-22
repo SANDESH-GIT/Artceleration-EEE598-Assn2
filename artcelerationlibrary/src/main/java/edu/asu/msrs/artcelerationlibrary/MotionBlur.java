@@ -45,7 +45,7 @@ public class MotionBlur implements Runnable {
         // TODO transform Logic
         Log.d("fd", "Motion Blur!");
 
-        // Horizontal motion blur
+        // Horizontal motion blur; a0=1 -> Vertical motion blur
         int a0 = 1;
 
         // radius
@@ -80,7 +80,6 @@ public class MotionBlur implements Runnable {
                     output.setPixel(i, j, Color.argb(255, Pr[i][j], Pg[i][j], Pb[i][j]));
                 }
             }
-
         }else if (a0==1){
             for (int i = 0; i < w; i++) {
                 for (int j = 0; j < h; j++) {
@@ -100,7 +99,7 @@ public class MotionBlur implements Runnable {
                 }
             }
         }else{
-            output=input;
+            output=input; //TODO: Should return null as per assignment change
         }
 
         try {
