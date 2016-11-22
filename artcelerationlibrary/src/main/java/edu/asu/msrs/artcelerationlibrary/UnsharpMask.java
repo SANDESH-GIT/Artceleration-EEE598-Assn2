@@ -65,7 +65,11 @@ public class UnsharpMask implements Runnable {
         int[][] Pr = new int[w][h];
         int[][] Pg = new int[w][h];
         int[][] Pb = new int[w][h];
-/*
+        int[][] r = new int[w][h]; // Red
+        int[][] g = new int[w][h]; // Green
+        int[][] b = new int[w][h]; // Blue
+        int pix;
+
         for(int i=0; i<size; i++){
             G[i]= (Math.exp(-(Math.pow(i-rad,2))/(2*Math.pow(sd,2)))/Math.sqrt(2*(Math.PI)*sd*sd));
             //Log.d("Unsharp,Gaussian Blur: ", "Calculating kernel"+G[i]);
@@ -73,12 +77,21 @@ public class UnsharpMask implements Runnable {
 
         for (int i=0;i<w;i++) {
             for (int j = 0; j < h; j++) {
+                pix = input.getPixel(i,j);
+                r[i][j] = Color.red(pix);
+                g[i][j] = Color.green(pix);
+                b[i][j] = Color.blue(pix);
+            }
+        }
+
+        for (int i=0;i<w;i++) {
+            for (int j = 0; j < h; j++) {
                 for (int k=0;k<size;k++) {
                     int xval = i-rad+k;
                     if(!(xval<0 || xval>=w)){
-                        qr[i][j] += G[k] * Color.red(input.getPixel(xval,j));
-                        qg[i][j] += G[k] * Color.green(input.getPixel(xval,j));
-                        qb[i][j] += G[k] * Color.blue(input.getPixel(xval,j));
+                        qr[i][j] += G[k] * r[xval][j];
+                        qg[i][j] += G[k] * g[xval][j];
+                        qb[i][j] += G[k] * b[xval][j];
                     }
                 }
             }
@@ -95,13 +108,13 @@ public class UnsharpMask implements Runnable {
                         //Log.d("Gaussian Blur","One pixel modified");
                     }
                 }
-                Pr[i][j] = Color.red(input.getPixel(i,j)) + (int)(f1*(Color.red(input.getPixel(i,j)) -  Pr[i][j]));
-                Pg[i][j] = Color.green(input.getPixel(i,j)) + (int)(f1*(Color.green(input.getPixel(i,j)) -  Pg[i][j]));
-                Pb[i][j] = Color.blue(input.getPixel(i,j)) + (int)(f1*(Color.blue(input.getPixel(i,j)) -  Pb[i][j]));
+                Pr[i][j] = r[i][j] + (int)(f1*(r[i][j] -  Pr[i][j]));
+                Pg[i][j] = g[i][j] + (int)(f1*(g[i][j] -  Pg[i][j]));
+                Pb[i][j] = b[i][j] + (int)(f1*(b[i][j] -  Pb[i][j]));
                 output.setPixel(i,j,Color.argb(255,Pr[i][j],Pg[i][j],Pb[i][j]));
             }
         }
-*/
+
         //TODO: Should return null if arguments passed are not proper
 
         try {
