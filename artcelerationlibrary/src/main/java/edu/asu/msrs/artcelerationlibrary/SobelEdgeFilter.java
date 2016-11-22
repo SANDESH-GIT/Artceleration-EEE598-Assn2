@@ -67,6 +67,8 @@ public class SobelEdgeFilter implements Runnable {
         int r, g, b;
         int pix;
 
+        int[][] gg = new int[w][h]; // Green
+
         for(int i=0; i< w; i++){
             for(int j=0; j<h; j++){
                 pix=input.getPixel(i,j); // getPixel returns an integer value of the color of pixel
@@ -80,14 +82,22 @@ public class SobelEdgeFilter implements Runnable {
             }
         }
 
+        for (int i=0;i<w;i++) {
+            for (int j = 0; j < h; j++) {
+                pix = grayScale.getPixel(i,j);
+                gg[i][j] = Color.green(pix);
+            }
+        }
+
+
         if (a0==0){
             int[][]Grx=new int[w][h];
             for (int i=1;i<w-1;i++) {
                 for (int j = 1; j < h-1; j++) {
 
-                    Grx[i][j] = sx[0][0]*Color.green(grayScale.getPixel(i-1, j-1)) + sx[1][0]*Color.green(grayScale.getPixel(i, j-1)) + sx[2][0]*Color.green(grayScale.getPixel(i+1, j-1))
-                            + sx[0][1]*Color.green(grayScale.getPixel(i-1, j)) + sx[1][1]*Color.green(grayScale.getPixel(i, j)) + sx[2][1]*Color.green(grayScale.getPixel(i+1, j))
-                            + sx[0][2]*Color.green(grayScale.getPixel(i-1, j+1)) + sx[1][2]*Color.green(grayScale.getPixel(i, j+1)) + sx[2][2]*Color.green(grayScale.getPixel(i+1, j+1));
+                    Grx[i][j] = sx[0][0]*gg[i-1][j-1] + sx[1][0]*gg[i][j-1]+ sx[2][0]*gg[i+1][j-1]
+                            + sx[0][1]*gg[i-1][j]+ sx[1][1]*gg[i][j]+ sx[2][1]*gg[i+1][j]
+                            + sx[0][2]*gg[i-1][j+1] + sx[1][2]*gg[i][j+1]+ sx[2][2]*gg[i+1][j+1];
 
                     output.setPixel(i, j , Color.argb(255, Grx[i][j], Grx[i][j], Grx[i][j]));
                 }
@@ -97,9 +107,9 @@ public class SobelEdgeFilter implements Runnable {
             for (int i=1;i<w-1;i++) {
                 for (int j = 1; j < h-1; j++) {
 
-                    Gry[i][j] = sy[0][0]*Color.green(grayScale.getPixel(i-1, j-1)) + sy[1][0]*Color.green(grayScale.getPixel(i, j-1)) + sy[2][0]*Color.green(grayScale.getPixel(i+1, j-1))
-                            + sy[0][1]*Color.green(grayScale.getPixel(i-1, j)) + sy[1][1]*Color.green(grayScale.getPixel(i, j)) + sy[2][1]*Color.green(grayScale.getPixel(i+1, j))
-                            + sy[0][2]*Color.green(grayScale.getPixel(i-1, j+1)) + sy[1][2]*Color.green(grayScale.getPixel(i, j+1)) + sy[2][2]*Color.green(grayScale.getPixel(i+1, j+1));
+                    Gry[i][j] =sy[0][0]*gg[i-1][j-1] + sy[1][0]*gg[i][j-1]+ sy[2][0]*gg[i+1][j-1]
+                            + sy[0][1]*gg[i-1][j]+ sy[1][1]*gg[i][j]+ sy[2][1]*gg[i+1][j]
+                            + sy[0][2]*gg[i-1][j+1] + sy[1][2]*gg[i][j+1]+ sy[2][2]*gg[i+1][j+1];
 
                     output.setPixel(i, j , Color.argb(255, Gry[i][j], Gry[i][j], Gry[i][j]));
                 }
@@ -110,45 +120,17 @@ public class SobelEdgeFilter implements Runnable {
             for (int i=1;i<w-1;i++) {
                 for (int j = 1; j < h-1; j++) {
 
-/**My change for red and green added (Use green as it is 58.70% of the grayscale image)
-                    Grx[i][j] = sx[0][0]*Color.red(grayScale.getPixel(i-1, j-1)) + sx[1][0]*Color.red(grayScale.getPixel(i, j-1)) + sx[2][0]*Color.red(grayScale.getPixel(i+1, j-1))
-                            + sx[0][1]*Color.red(grayScale.getPixel(i-1, j)) + sx[1][1]*Color.red(grayScale.getPixel(i, j)) + sx[2][1]*Color.red(grayScale.getPixel(i+1, j))
-                            + sx[0][2]*Color.red(grayScale.getPixel(i-1, j+1)) + sx[1][2]*Color.red(grayScale.getPixel(i, j+1)) + sx[2][2]*Color.red(grayScale.getPixel(i+1, j+1));
+                    Grx[i][j] = sx[0][0]*gg[i-1][j-1] + sx[1][0]*gg[i][j-1]+ sx[2][0]*gg[i+1][j-1]
+                            + sx[0][1]*gg[i-1][j]+ sx[1][1]*gg[i][j]+ sx[2][1]*gg[i+1][j]
+                            + sx[0][2]*gg[i-1][j+1] + sx[1][2]*gg[i][j+1]+ sx[2][2]*gg[i+1][j+1];
 
-                    Gry[i][j] = sy[0][0]*Color.red(grayScale.getPixel(i-1, j-1)) + sy[1][0]*Color.red(grayScale.getPixel(i, j-1)) + sy[2][0]*Color.red(grayScale.getPixel(i+1, j-1))
-                            + sy[0][1]*Color.red(grayScale.getPixel(i-1, j)) + sy[1][1]*Color.red(grayScale.getPixel(i, j)) + sy[2][1]*Color.red(grayScale.getPixel(i+1, j))
-                            + sy[0][2]*Color.red(grayScale.getPixel(i-1, j+1)) + sy[1][2]*Color.red(grayScale.getPixel(i, j+1)) + sy[2][2]*Color.red(grayScale.getPixel(i+1, j+1));
-
-                    int Gr = (int) Math.sqrt(Math.pow(Grx[i][j],2)+Math.pow(Gry[i][j],2));
-
-                    output.setPixel(i, j , Color.argb(255, Gr, Gr, Gr));
-*/
-
-                    Grx[i][j] = sx[0][0]*Color.green(grayScale.getPixel(i-1, j-1)) + sx[1][0]*Color.green(grayScale.getPixel(i, j-1)) + sx[2][0]*Color.green(grayScale.getPixel(i+1, j-1))
-                            + sx[0][1]*Color.green(grayScale.getPixel(i-1, j)) + sx[1][1]*Color.green(grayScale.getPixel(i, j)) + sx[2][1]*Color.green(grayScale.getPixel(i+1, j))
-                            + sx[0][2]*Color.green(grayScale.getPixel(i-1, j+1)) + sx[1][2]*Color.green(grayScale.getPixel(i, j+1)) + sx[2][2]*Color.green(grayScale.getPixel(i+1, j+1));
-
-                    Gry[i][j] = sy[0][0]*Color.green(grayScale.getPixel(i-1, j-1)) + sy[1][0]*Color.green(grayScale.getPixel(i, j-1)) + sy[2][0]*Color.green(grayScale.getPixel(i+1, j-1))
-                            + sy[0][1]*Color.green(grayScale.getPixel(i-1, j)) + sy[1][1]*Color.green(grayScale.getPixel(i, j)) + sy[2][1]*Color.green(grayScale.getPixel(i+1, j))
-                            + sy[0][2]*Color.green(grayScale.getPixel(i-1, j+1)) + sy[1][2]*Color.green(grayScale.getPixel(i, j+1)) + sy[2][2]*Color.green(grayScale.getPixel(i+1, j+1));
+                    Gry[i][j] =sy[0][0]*gg[i-1][j-1] + sy[1][0]*gg[i][j-1]+ sy[2][0]*gg[i+1][j-1]
+                            + sy[0][1]*gg[i-1][j]+ sy[1][1]*gg[i][j]+ sy[2][1]*gg[i+1][j]
+                            + sy[0][2]*gg[i-1][j+1] + sy[1][2]*gg[i][j+1]+ sy[2][2]*gg[i+1][j+1];
 
                     int Gr = (int) Math.sqrt(Grx[i][j]*Grx[i][j] + Gry[i][j]*Gry[i][j]);
 
                     output.setPixel(i, j , Color.argb(255, Gr, Gr, Gr));
-
-  /* Old logic -> removed this
-                    Grx[i][j] = sx[0][0]*grayScale.getPixel(i-1, j-1) + sx[1][0]*grayScale.getPixel(i, j-1) + sx[2][0]*grayScale.getPixel(i+1, j-1)
-                            + sx[0][1]*grayScale.getPixel(i-1, j) + sx[1][1]*grayScale.getPixel(i, j) + sx[2][1]*grayScale.getPixel(i+1, j)
-                            + sx[0][2]*grayScale.getPixel(i-1, j+1) + sx[1][2]*grayScale.getPixel(i, j+1) + sx[2][2]*grayScale.getPixel(i+1, j+1);
-
-                    Gry[i][j] = sy[0][0]*grayScale.getPixel(i-1, j-1) + sy[1][0]*grayScale.getPixel(i, j-1) + sy[2][0]*grayScale.getPixel(i+1, j-1)
-                            + sy[0][1]*grayScale.getPixel(i-1, j) + sy[1][1]*grayScale.getPixel(i, j) + sy[2][1]*grayScale.getPixel(i+1, j)
-                            + sy[0][2]*grayScale.getPixel(i-1, j+1) + sy[1][2]*grayScale.getPixel(i, j+1) + sy[2][2]*grayScale.getPixel(i+1, j+1);
-
-                    int Gr = (int) Math.sqrt(Grx[i][j]*Grx[i][j] + Gry[i][j]*Gry[i][j]);
-
-                    output.setPixel(i, j , Color.argb(255, Gr, Gr, Gr));
-*/
                 }
             }
         }else{
