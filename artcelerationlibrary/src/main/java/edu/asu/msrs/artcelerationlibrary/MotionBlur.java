@@ -61,6 +61,19 @@ public class MotionBlur implements Runnable {
         int[][] Pr = new int[w][h];
         int[][] Pg = new int[w][h];
         int[][] Pb = new int[w][h];
+        int[][] r = new int[w][h]; // Red
+        int[][] g = new int[w][h]; // Green
+        int[][] b = new int[w][h]; // Blue
+        int pix;
+
+        for (int i=0;i<w;i++) {
+            for (int j = 0; j < h; j++) {
+                pix = input.getPixel(i,j);
+                r[i][j] = Color.red(pix);
+                g[i][j] = Color.green(pix);
+                b[i][j] = Color.blue(pix);
+            }
+        }
 
         if (a0==0) {
             for (int i = 0; i < w; i++) {
@@ -68,9 +81,9 @@ public class MotionBlur implements Runnable {
                     for (int k = 0; k < size; k++) {
                         int xval = i - a1 + k;
                         if (!(xval < 0 || xval >= w)) {
-                            Pr[i][j] += Color.red(input.getPixel(xval, j));
-                            Pg[i][j] += Color.green(input.getPixel(xval, j));
-                            Pb[i][j] += Color.blue(input.getPixel(xval, j));
+                            Pr[i][j] += r[xval][j];
+                            Pg[i][j] += g[xval][j];
+                            Pb[i][j] += b[xval][j];
                         }
                     }
                     Pr[i][j] /= size;
@@ -86,9 +99,9 @@ public class MotionBlur implements Runnable {
                     for (int k = 0; k < size; k++) {
                         int yval = j - a1 + k;
                         if (!(yval < 0 || yval >= h)) {
-                            Pr[i][j] += Color.red(input.getPixel(i, yval));
-                            Pg[i][j] += Color.green(input.getPixel(i, yval));
-                            Pb[i][j] += Color.blue(input.getPixel(i, yval));
+                            Pr[i][j] += r[i][yval];
+                            Pg[i][j] += g[i][yval];
+                            Pb[i][j] += b[i][yval];
                         }
                     }
                     Pr[i][j] /= size;

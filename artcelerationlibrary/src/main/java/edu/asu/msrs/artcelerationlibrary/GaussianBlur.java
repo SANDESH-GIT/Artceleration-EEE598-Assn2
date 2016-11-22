@@ -66,6 +66,7 @@ public class GaussianBlur implements Runnable {
         int[][] r = new int[w][h]; // Red
         int[][] g = new int[w][h]; // Green
         int[][] b = new int[w][h]; // Blue
+        int pix;
 
         for(int i=0; i<size; i++){
             G[i]= (float) (Math.exp(-(Math.pow(i-rad,2))/(2*Math.pow(sd,2)))/Math.sqrt(2*(Math.PI)*sd*sd));
@@ -74,7 +75,7 @@ public class GaussianBlur implements Runnable {
 
         for (int i=0;i<w;i++) {
             for (int j = 0; j < h; j++) {
-                int pix = input.getPixel(i,j);
+                pix = input.getPixel(i,j);
                 r[i][j] = Color.red(pix);
                 g[i][j] = Color.green(pix);
                 b[i][j] = Color.blue(pix);
@@ -108,6 +109,7 @@ public class GaussianBlur implements Runnable {
                 output.setPixel(i,j,Color.argb(255,Pr[i][j],Pg[i][j],Pb[i][j]));
             }
         }
+
 
         //TODO: Should return null if arguments passed are not proper
 
