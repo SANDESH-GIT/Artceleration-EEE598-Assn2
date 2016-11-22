@@ -55,20 +55,20 @@ public class ColorFilter implements Runnable {
         // Image represented by 4-bytes (4 channels as A,R, G, B)
         int r, g, b;
         int pix;
-        int[] arr= {20,40,150,200,30,50,100,220,20,40,150,200,30,50,100,220,20,40,150,200,30,50,100,220};
+        int[] arr={20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220};
 
         // TODO: conditions on p1 as arrangement in increasing order otherwise return null
 
         // Slopes for red; when p0!=0 and p3!=255
-        double m1= ((double)arr[4]/arr[0]);
-        double c2= arr[4]-((((double)arr[5]-arr[4])/(arr[1]-arr[0]))*arr[0]);
-        double m2 = ((double)arr[5]-arr[4])/(arr[1]-arr[0]);
-        double c3 = arr[5]-((((double)arr[6]-arr[5])/(arr[2]-arr[1]))*arr[1]);
-        double m3= ((double)arr[6]-arr[5])/(arr[2]-arr[1]);
-        double c4= arr[6]-((((double)arr[7]-arr[6])/(arr[3]-arr[2]))*arr[2]);
-        double m4= ((double)arr[7]-arr[6])/(arr[3]-arr[2]);
-        double c5= arr[7]-((((double)255-arr[7])/(255-arr[3]))*arr[3]);
-        double m5= (((double)255-arr[7])/(255-arr[3]));
+        float m1= ((float)arr[1]/arr[0]);
+        float c2= arr[1]-((((float)arr[3]-arr[1])/(arr[2]-arr[0]))*arr[0]);
+        float m2 = ((float)arr[3]-arr[1])/(arr[2]-arr[0]);
+        float c3 = arr[3]-((((float)arr[5]-arr[3])/(arr[4]-arr[2]))*arr[2]);
+        float m3= ((float)arr[5]-arr[3])/(arr[4]-arr[2]);
+        float c4= arr[5]-((((float)arr[7]-arr[5])/(arr[6]-arr[4]))*arr[4]);
+        float m4= ((float)arr[7]-arr[5])/(arr[6]-arr[4]);
+        float c5= arr[7]-((((float)255-arr[7])/(255-arr[6]))*arr[6]);
+        float m5= (((float)255-arr[7])/(255-arr[6]));
 
 
         // Iterate over all pixels
@@ -81,65 +81,65 @@ public class ColorFilter implements Runnable {
                 b=Color.blue(pix);
 
                 // Mapping for red channel
-                if (arr[0]!=0 && arr[3]!=255){
+                if (arr[0]!=0 && arr[6]!=255){
                     if (r<=arr[0]){
                         r = (int) (m1*r);
-                    }else if(r>=arr[0] && r<=arr[1]) {
+                    }else if(r>=arr[0] && r<=arr[2]) {
                         r= (int) ((m2*r)+c2);
-                    }else if(r>=arr[1] && r<=arr[2]){
+                    }else if(r>=arr[2] && r<=arr[4]){
                         r=(int) ((m3*r)+c3);
-                    }else if (r>=arr[2] && r<=arr[3]){
+                    }else if (r>=arr[4] && r<=arr[6]){
                         r= (int) ((m4*r)+c4);
                     }else{
                         r= (int) ((m5*r)+c5);
                     }
-                }else if (arr[0]==0 && arr[3]!=255){
+                }else if (arr[0]==0 && arr[6]!=255){
 
-                }else if (arr[0]==0 && arr[3]==255){
+                }else if (arr[0]==0 && arr[6]==255){
 
-                }else if (arr[0]!=0 && arr[3]==255){
+                }else if (arr[0]!=0 && arr[6]==255){
 
                 }
 
                 // Mapping for green channel
-                if (arr[8]!=0 && arr[11]!=255){
-                    if (g<=arr[0]){
+                if (arr[8]!=0 && arr[14]!=255){
+                    if (g<=arr[8]){
                         g = (int) (m1*g);
-                    }else if(g>=arr[8] && g<=arr[9]) {
+                    }else if(g>=arr[8] && g<=arr[10]) {
                         g= (int) ((m2*g)+c2);
-                    }else if(g>=arr[9] && g<=arr[10]){
+                    }else if(g>=arr[10] && g<=arr[12]){
                         g=(int) ((m3*g)+c3);
-                    }else if (g>=arr[10] && g<=arr[11]){
+                    }else if (g>=arr[12] && g<=arr[14]){
                         g= (int) ((m4*g)+c4);
                     }else{
                         g= (int) ((m5*g)+c5);
                     }
-                }else if (arr[8]==0 && arr[11]!=255){
+                }else if (arr[8]==0 && arr[14]!=255){
 
-                }else if (arr[8]==0 && arr[11]==255){
+                }else if (arr[8]==0 && arr[14]==255){
 
-                }else if (arr[8]!=0 && arr[11]==255){
+                }else if (arr[8]!=0 && arr[14]==255){
 
                 }
 
                 // Mapping for blue channel
-                if (arr[16]!=0 && arr[19]!=255){
+                if (arr[16]!=0 && arr[22]!=255){
                     if (b<=arr[16]){
                         b = (int) (m1*b);
-                    }else if(b>=arr[16] && b<=arr[17]) {
+                    }else if(b>=arr[16] && b<=arr[18]) {
                         b= (int) ((m2*b)+c2);
-                    }else if(b>=arr[17] && b<=arr[18]){
+                    }else if(b>=arr[18] && b<=arr[20]){
                         b=(int) ((m3*b)+c3);
-                    }else if (b>=arr[18] && b<=arr[19]){
+                    }else if (b>=arr[20] && b<=arr[22]){
                         b= (int) ((m4*b)+c4);
                     }else{
                         b= (int) ((m5*b)+c5);
                     }
-                }else if (arr[16]==0 && arr[19]!=255){
+                }else if (arr[16]==0 && arr[22]!=255){
 
-                }else if (arr[16]==0 && arr[19]==255){
+                }else if (arr[16]==0 && arr[22]==255){
 
-                }else if (arr[16]!=0 && arr[19]==255){
+                }else if (arr[16]!=0 && arr[22]==255){
 
                 }
 
@@ -148,6 +148,8 @@ public class ColorFilter implements Runnable {
         }
 
         //TODO: Should return null if arguments passed are not proper
+
+        Log.d("Color filter","Done processing...!!!");
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

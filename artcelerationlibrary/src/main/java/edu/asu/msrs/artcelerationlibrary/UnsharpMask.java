@@ -58,10 +58,10 @@ public class UnsharpMask implements Runnable {
         Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
         //Bitmap q = Bitmap.createBitmap(w,h,input.getConfig());
 
-        double[] G = new double[size];
-        double[][] qr = new double[w][h];
-        double[][] qg = new double[w][h];
-        double[][] qb = new double[w][h];
+        float[] G = new float[size];
+        float[][] qr = new float[w][h];
+        float[][] qg = new float[w][h];
+        float[][] qb = new float[w][h];
         int[][] Pr = new int[w][h];
         int[][] Pg = new int[w][h];
         int[][] Pb = new int[w][h];
@@ -70,8 +70,9 @@ public class UnsharpMask implements Runnable {
         int[][] b = new int[w][h]; // Blue
         int pix;
 
+        // TODO: Remove pow and add simple multiplication
         for(int i=0; i<size; i++){
-            G[i]= (Math.exp(-(Math.pow(i-rad,2))/(2*Math.pow(sd,2)))/Math.sqrt(2*(Math.PI)*sd*sd));
+            G[i]= (float) (Math.exp(-((i-rad)*(i-rad))/(2*sd*sd))/Math.sqrt(2*(Math.PI)*sd*sd));
             //Log.d("Unsharp,Gaussian Blur: ", "Calculating kernel"+G[i]);
         }
 
@@ -116,6 +117,8 @@ public class UnsharpMask implements Runnable {
         }
 
         //TODO: Should return null if arguments passed are not proper
+
+        Log.d("Unsharp mask","Done processing...!!!");
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

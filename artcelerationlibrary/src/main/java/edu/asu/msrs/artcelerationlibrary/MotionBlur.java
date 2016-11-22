@@ -115,6 +115,8 @@ public class MotionBlur implements Runnable {
             output=input; //TODO: Should return null as per assignment change
         }
 
+        Log.d("Motion Blur","Done processing...!!!");
+
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             output.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);

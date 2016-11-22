@@ -137,6 +137,8 @@ public class SobelEdgeFilter implements Runnable {
             output=input; //TODO: Should return null as per assignment change
         }
 
+        Log.d("Sobel Edge Filter","Done processing...!!!");
+
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             output.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);

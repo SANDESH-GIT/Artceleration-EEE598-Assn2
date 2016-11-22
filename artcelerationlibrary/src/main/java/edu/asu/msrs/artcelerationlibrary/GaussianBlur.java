@@ -68,9 +68,10 @@ public class GaussianBlur implements Runnable {
         int[][] b = new int[w][h]; // Blue
         int pix;
 
+        // TODO: Remove pow and add simple multiplication
         for(int i=0; i<size; i++){
-            G[i]= (float) (Math.exp(-(Math.pow(i-rad,2))/(2*Math.pow(sd,2)))/Math.sqrt(2*(Math.PI)*sd*sd));
-            Log.d("Gaussian Blur: ", "Calculating kernel"+G[i]);
+            G[i]= (float) (Math.exp(-((i-rad)*(i-rad))/(2*sd*sd))/Math.sqrt(2*(Math.PI)*sd*sd));
+            //Log.d("Gaussian Blur: ", "Calculating kernel"+G[i]);
         }
 
         for (int i=0;i<w;i++) {
