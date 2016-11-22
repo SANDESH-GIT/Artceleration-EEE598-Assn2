@@ -56,17 +56,29 @@ public class GaussianBlur implements Runnable {
         // Creating bitmap to be returned as a modified (mutable output bitmap)
         Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
 
-        double[] G = new double[size];
-        double[][] qr = new double[w][h];
-        double[][] qg = new double[w][h];
-        double[][] qb = new double[w][h];
+        float[] G = new float[size];
+        float[][] qr = new float[w][h];
+        float[][] qg = new float[w][h];
+        float[][] qb = new float[w][h];
         int[][] Pr = new int[w][h];
         int[][] Pg = new int[w][h];
         int[][] Pb = new int[w][h];
+        int[][] r = new int[w][h]; // Red
+        int[][] g = new int[w][h]; // Green
+        int[][] b = new int[w][h]; // Blue
 
         for(int i=0; i<size; i++){
-            G[i]= (Math.exp(-(Math.pow(i-rad,2))/(2*Math.pow(sd,2)))/Math.sqrt(2*(Math.PI)*sd*sd));
+            G[i]= (float) (Math.exp(-(Math.pow(i-rad,2))/(2*Math.pow(sd,2)))/Math.sqrt(2*(Math.PI)*sd*sd));
             Log.d("Gaussian Blur: ", "Calculating kernel"+G[i]);
+        }
+
+        for (int i=0;i<w;i++) {
+            for (int j = 0; j < h; j++) {
+                int pix = input.getPixel(i,j);
+                r[i][j] = Color.red(pix);
+                g[i][j] = Color.green(pix);
+                b[i][j] = Color.blue(pix);
+            }
         }
 
         for (int i=0;i<w;i++) {
@@ -74,9 +86,9 @@ public class GaussianBlur implements Runnable {
                 for (int k=0;k<size;k++) {
                     int xval = i-rad+k;
                     if(!(xval<0 || xval>=w)){
-                        qr[i][j] += G[k] * Color.red(input.getPixel(xval,j));
-                        qg[i][j] += G[k] * Color.green(input.getPixel(xval,j));
-                        qb[i][j] += G[k] * Color.blue(input.getPixel(xval,j));
+                        qr[i][j] += G[k] * r[xval][j];
+                        qg[i][j] += G[k] * g[xval][j];
+                        qb[i][j] += G[k] * b[xval][j];
                     }
                 }
             }
@@ -96,6 +108,7 @@ public class GaussianBlur implements Runnable {
                 output.setPixel(i,j,Color.argb(255,Pr[i][j],Pg[i][j],Pb[i][j]));
             }
         }
+
         //TODO: Should return null if arguments passed are not proper
 
         Log.d("Gaussian Blur","Done processing...!!!");
