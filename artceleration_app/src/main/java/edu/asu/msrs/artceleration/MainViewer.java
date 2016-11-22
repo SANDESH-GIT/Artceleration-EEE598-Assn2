@@ -97,7 +97,8 @@ public class MainViewer extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 TransformTest t = tests[position];
-                if (artlib.requestTransform(src_img, t.transformType, t.intArgs, t.floatArgs)){
+                Bitmap b = artlib.requestTransform(src_img, t.transformType, t.intArgs, t.floatArgs);
+                if (b !=null){
                     makeToast("Transform requested : "+ transforms[t.transformType]);
                 }else{
                     makeToast("Transform request failed"+ transforms[t.transformType]);

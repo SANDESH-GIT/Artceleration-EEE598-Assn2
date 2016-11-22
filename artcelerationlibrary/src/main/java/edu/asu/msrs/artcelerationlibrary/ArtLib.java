@@ -93,7 +93,7 @@ public class ArtLib {
     }
 
     // requestTransform method is invoked by the application having input parameter as Bitmap input image to be processed.
-    public boolean requestTransform(Bitmap img, int index, int[] intArgs, float[] floatArgs){
+    public Bitmap requestTransform(Bitmap img, int index, int[] intArgs, float[] floatArgs){
         MemoryFile memoryFile = null;
         try {
             queue.add(requestNo);
@@ -132,7 +132,7 @@ public class ArtLib {
             e.printStackTrace();
         }
 
-        return true;
+        return img;
     }
 
     final Messenger client = new Messenger(new ArtLibHandler());

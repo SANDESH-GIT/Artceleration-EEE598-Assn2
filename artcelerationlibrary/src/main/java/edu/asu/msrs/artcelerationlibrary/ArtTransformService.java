@@ -90,8 +90,10 @@ public class ArtTransformService extends Service {
                 default:
                     break;
             }
+            bitmap = null;
         }
     }
+
 
     // Messenger object pointing to ArtTransformHandler
     final Messenger m = new Messenger(new ArtTransformHandler());
