@@ -55,21 +55,154 @@ public class ColorFilter implements Runnable {
         // Image represented by 4-bytes (4 channels as A,R, G, B)
         int r, g, b;
         int pix;
+
+        // Red channel slopes and constant
+        float Rm1 = 0;
+        float Rc2 = 0;
+        float Rm2 = 0;
+        float Rc3 = 0;
+        float Rm3 = 0;
+        float Rc4 = 0;
+        float Rm4 = 0;
+        float Rc5 = 0;
+        float Rm5 = 0;
+
+        // Green channel slopes and constant
+        float Gm1 = 0;
+        float Gc2 = 0;
+        float Gm2 = 0;
+        float Gc3 = 0;
+        float Gm3 = 0;
+        float Gc4 = 0;
+        float Gm4 = 0;
+        float Gc5 = 0;
+        float Gm5 = 0;
+
+        // Blue channel slopes and constant
+        float Bm1 = 0;
+        float Bc2 = 0;
+        float Bm2 = 0;
+        float Bc3 = 0;
+        float Bm3 = 0;
+        float Bc4 = 0;
+        float Bm4 = 0;
+        float Bc5 = 0;
+        float Bm5 = 0;
+
         int[] arr={20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220};
 
         // TODO: conditions on p1 as arrangement in increasing order otherwise return null
 
-        // Slopes for red; when p0!=0 and p3!=255
-        float m1= ((float)arr[1]/arr[0]);
-        float c2= arr[1]-((((float)arr[3]-arr[1])/(arr[2]-arr[0]))*arr[0]);
-        float m2 = ((float)arr[3]-arr[1])/(arr[2]-arr[0]);
-        float c3 = arr[3]-((((float)arr[5]-arr[3])/(arr[4]-arr[2]))*arr[2]);
-        float m3= ((float)arr[5]-arr[3])/(arr[4]-arr[2]);
-        float c4= arr[5]-((((float)arr[7]-arr[5])/(arr[6]-arr[4]))*arr[4]);
-        float m4= ((float)arr[7]-arr[5])/(arr[6]-arr[4]);
-        float c5= arr[7]-((((float)255-arr[7])/(255-arr[6]))*arr[6]);
-        float m5= (((float)255-arr[7])/(255-arr[6]));
+        // Slopes for red; when p0!=0 and p6!=255
+        if (arr[0]!=0 && arr[6]!=255) {
+            Rm1 = ((float) arr[1] / arr[0]);
+            Rm2 = ((float) arr[3] - arr[1]) / (arr[2] - arr[0]);
+            Rc2 = arr[1] - (Rm2 * arr[0]);
+            Rm3 = ((float) arr[5] - arr[3]) / (arr[4] - arr[2]);
+            Rc3 = arr[3] - (Rm3 * arr[2]);
+            Rm4 = ((float) arr[7] - arr[5]) / (arr[6] - arr[4]);
+            Rc4 = arr[5] - (Rm4 * arr[4]);
+            Rm5 = (((float) 255 - arr[7]) / (255 - arr[6]));
+            Rc5 = arr[7] - (Rm5 * arr[6]);
+        }else if (arr[0]==0 && arr[6]!=255){
+            Rm2 = ((float) arr[3] - arr[1]) / (arr[2] - arr[0]);
+            Rc2 = arr[1];
+            Rm3 = ((float) arr[5] - arr[3]) / (arr[4] - arr[2]);
+            Rc3 = arr[3] - (Rm3 * arr[2]);
+            Rm4 = ((float) arr[7] - arr[5]) / (arr[6] - arr[4]);
+            Rc4 = arr[5] - (Rm4 * arr[4]);
+            Rm5 = (((float) 255 - arr[7]) / (255 - arr[6]));
+            Rc5 = arr[7] - (Rm5 * arr[6]);
+        }else if (arr[0]==0 && arr[6]==255){
+            Rm2 = ((float) arr[3] - arr[1]) / (arr[2] - arr[0]);
+            Rc2 = arr[1];
+            Rm3 = ((float) arr[5] - arr[3]) / (arr[4] - arr[2]);
+            Rc3 = arr[3] - (Rm3 * arr[2]);
+            Rm4 = ((float) arr[7] - arr[5]) / (arr[6] - arr[4]);
+            Rc4 = arr[5] - (Rm4 * arr[4]);
+        }else if (arr[0]!=0 && arr[6]==255){
+            Rm1 = ((float) arr[1] / arr[0]);
+            Rm2 = ((float) arr[3] - arr[1]) / (arr[2] - arr[0]);
+            Rc2 = arr[1] - (Rm2 * arr[0]);
+            Rm3 = ((float) arr[5] - arr[3]) / (arr[4] - arr[2]);
+            Rc3 = arr[3] - (Rm3 * arr[2]);
+            Rm4 = ((float) arr[7] - arr[5]) / (arr[6] - arr[4]);
+            Rc4 = arr[5] - (Rm4 * arr[4]);
+        }
 
+        // Slopes for green
+        if (arr[8]!=0 && arr[14]!=255){
+            Gm1 = ((float) arr[9] / arr[8]);
+            Gm2 = ((float) arr[11] - arr[9]) / (arr[10] - arr[8]);
+            Gc2 = arr[9] - (Gm2 * arr[8]);
+            Gm3 = ((float) arr[13] - arr[11]) / (arr[12] - arr[10]);
+            Gc3 = arr[11] - (Gm3 * arr[10]);
+            Gm4 = ((float) arr[15] - arr[13]) / (arr[14] - arr[12]);
+            Gc4 = arr[13] - (Gm4 * arr[12]);
+            Gm5 = (((float) 255 - arr[15]) / (255 - arr[14]));
+            Gc5 = arr[15] - (Gm5 * arr[14]);
+        }else if (arr[8]==0 && arr[14]!=255){
+            Gm2 = ((float) arr[11] - arr[9]) / (arr[10] - arr[8]);
+            Gc2 = arr[9];
+            Gm3 = ((float) arr[13] - arr[11]) / (arr[12] - arr[10]);
+            Gc3 = arr[11] - (Gm3 * arr[10]);
+            Gm4 = ((float) arr[15] - arr[13]) / (arr[14] - arr[12]);
+            Gc4 = arr[13] - (Gm4 * arr[12]);
+            Gm5 = (((float) 255 - arr[15]) / (255 - arr[14]));
+            Gc5 = arr[15] - (Gm5 * arr[14]);
+        }else if (arr[8]==0 && arr[14]==255){
+            Gm2 = ((float) arr[11] - arr[9]) / (arr[10] - arr[8]);
+            Gc2 = arr[9];
+            Gm3 = ((float) arr[13] - arr[11]) / (arr[12] - arr[10]);
+            Gc3 = arr[11] - (Gm3 * arr[10]);
+            Gm4 = ((float) arr[15] - arr[13]) / (arr[14] - arr[12]);
+            Gc4 = arr[13] - (Gm4 * arr[12]);
+        }else if (arr[8]!=0 && arr[14]==255){
+            Gm1 = ((float) arr[9] / arr[8]);
+            Gm2 = ((float) arr[11] - arr[9]) / (arr[10] - arr[8]);
+            Gc2 = arr[9] - (Gm2 * arr[8]);
+            Gm3 = ((float) arr[13] - arr[11]) / (arr[12] - arr[10]);
+            Gc3 = arr[11] - (Gm3 * arr[10]);
+            Gm4 = ((float) arr[15] - arr[13]) / (arr[14] - arr[12]);
+            Gc4 = arr[13] - (Gm4 * arr[12]);
+        }
+
+        // Slopes for blue
+        if (arr[16]!=0 && arr[22]!=255){
+            Bm1 = ((float) arr[17] / arr[16]);
+            Bm2 = ((float) arr[19] - arr[17]) / (arr[18] - arr[16]);
+            Bc2 = arr[17] - (Bm2 * arr[16]);
+            Bm3 = ((float) arr[21] - arr[19]) / (arr[20] - arr[18]);
+            Bc3 = arr[19] - (Bm3 * arr[18]);
+            Bm4 = ((float) arr[23] - arr[21]) / (arr[22] - arr[20]);
+            Bc4 = arr[21] - (Bm4 * arr[20]);
+            Bm5 = (((float) 255 - arr[23]) / (255 - arr[22]));
+            Bc5 = arr[23] - ((((float) 255 - arr[23]) / (255 - arr[22])) * arr[22]);
+        }else if (arr[16]==0 && arr[22]!=255){
+            Bm2 = ((float) arr[19] - arr[17]) / (arr[18] - arr[16]);
+            Bc2 = arr[17];
+            Bm3 = ((float) arr[21] - arr[19]) / (arr[20] - arr[18]);
+            Bc3 = arr[19] - (Bm3 * arr[18]);
+            Bm4 = ((float) arr[23] - arr[21]) / (arr[22] - arr[20]);
+            Bc4 = arr[21] - (Bm4 * arr[20]);
+            Bm5 = (((float) 255 - arr[23]) / (255 - arr[22]));
+            Bc5 = arr[23] - ((((float) 255 - arr[23]) / (255 - arr[22])) * arr[22]);
+        }else if (arr[16]==0 && arr[22]==255){
+            Bm2 = ((float) arr[19] - arr[17]) / (arr[18] - arr[16]);
+            Bc2 = arr[17];
+            Bm3 = ((float) arr[21] - arr[19]) / (arr[20] - arr[18]);
+            Bc3 = arr[19] - (Bm3 * arr[18]);
+            Bm4 = ((float) arr[23] - arr[21]) / (arr[22] - arr[20]);
+            Bc4 = arr[21] - (Bm4 * arr[20]);
+        }else if (arr[16]!=0 && arr[22]==255){
+            Bm1 = ((float) arr[17] / arr[16]);
+            Bm2 = ((float) arr[19] - arr[17]) / (arr[18] - arr[16]);
+            Bc2 = arr[17] - (Bm2 * arr[16]);
+            Bm3 = ((float) arr[21] - arr[19]) / (arr[20] - arr[18]);
+            Bc3 = arr[19] - (Bm3 * arr[18]);
+            Bm4 = ((float) arr[23] - arr[21]) / (arr[22] - arr[20]);
+            Bc4 = arr[21] - (Bm4 * arr[20]);
+        }
 
         // Iterate over all pixels
         for(int i=0; i< w; i++){
@@ -83,64 +216,130 @@ public class ColorFilter implements Runnable {
                 // Mapping for red channel
                 if (arr[0]!=0 && arr[6]!=255){
                     if (r<=arr[0]){
-                        r = (int) (m1*r);
-                    }else if(r>=arr[0] && r<=arr[2]) {
-                        r= (int) ((m2*r)+c2);
-                    }else if(r>=arr[2] && r<=arr[4]){
-                        r=(int) ((m3*r)+c3);
-                    }else if (r>=arr[4] && r<=arr[6]){
-                        r= (int) ((m4*r)+c4);
+                        r = (int) (Rm1*r);
+                    }else if(r>arr[0] && r<=arr[2]) {
+                        r= (int) ((Rm2*r)+Rc2);
+                    }else if(r>arr[2] && r<=arr[4]){
+                        r=(int) ((Rm3*r)+Rc3);
+                    }else if (r>arr[4] && r<=arr[6]){
+                        r= (int) ((Rm4*r)+Rc4);
                     }else{
-                        r= (int) ((m5*r)+c5);
+                        r= (int) ((Rm5*r)+Rc5);
                     }
                 }else if (arr[0]==0 && arr[6]!=255){
-
+                    if(r<=arr[2]) {
+                        r= (int) ((Rm2*r)+Rc2);
+                    }else if(r>arr[2] && r<=arr[4]){
+                        r=(int) ((Rm3*r)+Rc3);
+                    }else if (r>arr[4] && r<=arr[6]){
+                        r= (int) ((Rm4*r)+Rc4);
+                    }else{
+                        r= (int) ((Rm5*r)+Rc5);
+                    }
                 }else if (arr[0]==0 && arr[6]==255){
-
+                    if(r<=arr[2]) {
+                        r= (int) ((Rm2*r)+Rc2);
+                    }else if(r>arr[2] && r<=arr[4]){
+                        r=(int) ((Rm3*r)+Rc3);
+                    }else{
+                        r= (int) ((Rm4*r)+Rc4);
+                    }
                 }else if (arr[0]!=0 && arr[6]==255){
-
+                    if (r<=arr[0]){
+                        r = (int) (Rm1*r);
+                    }else if(r>arr[0] && r<=arr[2]) {
+                        r= (int) ((Rm2*r)+Rc2);
+                    }else if(r>arr[2] && r<=arr[4]){
+                        r=(int) ((Rm3*r)+Rc3);
+                    }else{
+                        r= (int) ((Rm4*r)+Rc4);
+                    }
                 }
 
                 // Mapping for green channel
                 if (arr[8]!=0 && arr[14]!=255){
                     if (g<=arr[8]){
-                        g = (int) (m1*g);
+                        g = (int) (Gm1*g);
                     }else if(g>=arr[8] && g<=arr[10]) {
-                        g= (int) ((m2*g)+c2);
+                        g= (int) ((Gm2*g)+Gc2);
                     }else if(g>=arr[10] && g<=arr[12]){
-                        g=(int) ((m3*g)+c3);
+                        g=(int) ((Gm3*g)+Gc3);
                     }else if (g>=arr[12] && g<=arr[14]){
-                        g= (int) ((m4*g)+c4);
+                        g= (int) ((Gm4*g)+Gc4);
                     }else{
-                        g= (int) ((m5*g)+c5);
+                        g= (int) ((Gm5*g)+Gc5);
                     }
                 }else if (arr[8]==0 && arr[14]!=255){
-
+                    if(g<=arr[10]) {
+                        g= (int) ((Gm2*g)+Gc2);
+                    }else if(g>=arr[10] && g<=arr[12]){
+                        g=(int) ((Gm3*g)+Gc3);
+                    }else if (g>=arr[12] && g<=arr[14]){
+                        g= (int) ((Gm4*g)+Gc4);
+                    }else{
+                        g= (int) ((Gm5*g)+Gc5);
+                    }
                 }else if (arr[8]==0 && arr[14]==255){
-
+                    if(g<=arr[10]) {
+                        g= (int) ((Gm2*g)+Gc2);
+                    }else if(g>=arr[10] && g<=arr[12]){
+                        g=(int) ((Gm3*g)+Gc3);
+                    }else{
+                        g= (int) ((Gm4*g)+Gc4);
+                    }
                 }else if (arr[8]!=0 && arr[14]==255){
-
+                    if (g<=arr[8]){
+                        g = (int) (Gm1*g);
+                    }else if(g>=arr[8] && g<=arr[10]) {
+                        g= (int) ((Gm2*g)+Gc2);
+                    }else if(g>=arr[10] && g<=arr[12]){
+                        g=(int) ((Gm3*g)+Gc3);
+                    }else{
+                        g= (int) ((Gm4*g)+Gc4);
+                    }
                 }
 
                 // Mapping for blue channel
                 if (arr[16]!=0 && arr[22]!=255){
                     if (b<=arr[16]){
-                        b = (int) (m1*b);
+                        b = (int) (Bm1*b);
                     }else if(b>=arr[16] && b<=arr[18]) {
-                        b= (int) ((m2*b)+c2);
+                        b= (int) ((Bm2*b)+Bc2);
                     }else if(b>=arr[18] && b<=arr[20]){
-                        b=(int) ((m3*b)+c3);
+                        b=(int) ((Bm3*b)+Bc3);
                     }else if (b>=arr[20] && b<=arr[22]){
-                        b= (int) ((m4*b)+c4);
+                        b= (int) ((Bm4*b)+Bc4);
                     }else{
-                        b= (int) ((m5*b)+c5);
+                        b= (int) ((Bm5*b)+Bc5);
                     }
                 }else if (arr[16]==0 && arr[22]!=255){
-
+                    if(b<=arr[18]) {
+                        b= (int) ((Bm2*b)+Bc2);
+                    }else if(b>=arr[18] && b<=arr[20]){
+                        b=(int) ((Bm3*b)+Bc3);
+                    }else if (b>=arr[20] && b<=arr[22]){
+                        b= (int) ((Bm4*b)+Bc4);
+                    }else{
+                        b= (int) ((Bm5*b)+Bc5);
+                    }
                 }else if (arr[16]==0 && arr[22]==255){
-
+                    if(b<=arr[18]) {
+                        b= (int) ((Bm2*b)+Bc2);
+                    }else if(b>=arr[18] && b<=arr[20]){
+                        b=(int) ((Bm3*b)+Bc3);
+                    }else{
+                        b= (int) ((Bm4*b)+Bc4);
+                    }
                 }else if (arr[16]!=0 && arr[22]==255){
-
+                    if (b<=arr[16]){
+                        b = (int) (Bm1*b);
+                    }else if(b>=arr[16] && b<=arr[18]) {
+                        b= (int) ((Bm2*b)+Bc2);
+                    }else if(b>=arr[18] && b<=arr[20]){
+                        b=(int) ((Bm3*b)+Bc3);
+                    }else{
+                        b= (int) ((Bm4*b)+Bc4);
+                    }
                 }
 
                 output.setPixel(i,j,Color.argb(255,r,g,b));
