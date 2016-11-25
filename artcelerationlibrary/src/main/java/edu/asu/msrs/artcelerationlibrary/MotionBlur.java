@@ -34,7 +34,9 @@ public class MotionBlur implements Runnable {
         this.memoryFile = memoryFile;
     }
 
-
+    static {
+        System.loadLibrary("MotionBlurLib");
+    }
     /**
      * Run method includes all the transform logic for processing the input Bitmap image.
      * Writes the output image to the Memory File and shares the file descriptor of this file
@@ -42,11 +44,12 @@ public class MotionBlur implements Runnable {
      */
     @Override
     public void run() {
+
         // TODO transform Logic
         Log.d("fd", "Motion Blur!");
 
         // Horizontal motion blur; a0=1 -> Vertical motion blur
-        int a0 = 1;
+        int a0 = 0;
 
         // radius
         int a1=8;
@@ -58,9 +61,11 @@ public class MotionBlur implements Runnable {
         // Creating bitmap to be returned as a modified (mutable output bitmap)
         Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
         int size = 2*a1+1;
+        /*
         int[][] Pr = new int[w][h];
         int[][] Pg = new int[w][h];
         int[][] Pb = new int[w][h];
+
         int[][] r = new int[w][h]; // Red
         int[][] g = new int[w][h]; // Green
         int[][] b = new int[w][h]; // Blue
@@ -75,9 +80,12 @@ public class MotionBlur implements Runnable {
             }
         }
 
+
+        //Log.d("fd", "ret: "+op);
+
         if (a0==0) {
-            for (int i = 0; i < w; i++) {
-                for (int j = 0; j < h; j++) {
+            for(int j = 0; j < h; j++){
+                for(int i =0; i < w; i++){
                     for (int k = 0; k < size; k++) {
                         int xval = i - a1 + k;
                         if (!(xval < 0 || xval >= w)) {
@@ -115,6 +123,9 @@ public class MotionBlur implements Runnable {
             output=input; //TODO: Should return null as per assignment change
         }
 
+        */
+
+        getMotionBlur(a0, a1, input, size);
         Log.d("Motion Blur","Done processing...!!!");
 
         try {
@@ -139,4 +150,8 @@ public class MotionBlur implements Runnable {
         }
 
     }
+
+    public native static void getMotionBlur(int a0, int a1, Bitmap img, int size);
+
 }
+
