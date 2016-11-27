@@ -61,7 +61,7 @@ public class MotionBlur implements Runnable {
         // Creating bitmap to be returned as a modified (mutable output bitmap)
         Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
         int size = 2*a1+1;
-        /*
+/*
         int[][] Pr = new int[w][h];
         int[][] Pg = new int[w][h];
         int[][] Pb = new int[w][h];
@@ -123,14 +123,14 @@ public class MotionBlur implements Runnable {
             output=input; //TODO: Should return null as per assignment change
         }
 
-        */
+*/
 
         getMotionBlur(a0, a1, input, size);
         Log.d("Motion Blur","Done processing...!!!");
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            output.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            input.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             byte[] oparray = outputStream.toByteArray();
             memoryFile.getOutputStream().write(oparray);
 
