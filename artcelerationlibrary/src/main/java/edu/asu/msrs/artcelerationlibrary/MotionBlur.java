@@ -48,19 +48,21 @@ public class MotionBlur implements Runnable {
         // TODO transform Logic
         Log.d("fd", "Motion Blur!");
 
-        // Horizontal motion blur; a0=1 -> Vertical motion blur
+        // a0=0-> Horizontal motion blur; a0=1 -> Vertical motion blur
         int a0 = 0;
 
         // radius
         int a1=8;
+
+        int size = 2*a1+1;
 
         // Image size, w-> width & h->height
         int w = input.getWidth();
         int h = input.getHeight();
 
         // Creating bitmap to be returned as a modified (mutable output bitmap)
-        Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
-        int size = 2*a1+1;
+         Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
+
 /*
         int[][] Pr = new int[w][h];
         int[][] Pg = new int[w][h];
@@ -122,15 +124,15 @@ public class MotionBlur implements Runnable {
         }else{
             output=input; //TODO: Should return null as per assignment change
         }
-
 */
 
-        getMotionBlur(a0, a1, input, size);
+
+        getMotionBlur(a0, a1, input, output);
         Log.d("Motion Blur","Done processing...!!!");
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            input.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            output.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             byte[] oparray = outputStream.toByteArray();
             memoryFile.getOutputStream().write(oparray);
 
@@ -151,7 +153,7 @@ public class MotionBlur implements Runnable {
 
     }
 
-    public native static void getMotionBlur(int a0, int a1, Bitmap img, int size);
+    public native static void getMotionBlur(int a0, int a1, Bitmap input,Bitmap output);
 
 }
 

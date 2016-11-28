@@ -11,126 +11,139 @@
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 
+using namespace std;
 
-static void process(AndroidBitmapInfo* info, void* pixels, int a0, int a1, int size){
+static void process(AndroidBitmapInfo* info, void* input, void* output,int a0, int a1){
 	int i, j, k;
 	uint32_t* line;
-	void* px;
+    uint32_t* line1;
+    int size=2*a1+1;
+	void* px = input;
+    void* pxo = output;
 	int xval;
+    int yval;
 
-	static int r[info->width][info->height];
-	static int g[info->width][info->height];
-	static int b[info->width][info->height];
+    int r[info->width][info->height];
+    int g[info->width][info->height];
+    int b[info->width][info->height];
 
 	int Pr[info->width][info->height];
     int Pg[info->width][info->height];
     int Pb[info->width][info->height];
 
+    if (a0==0) {
+        for (j = 0; j < info->height; j++) {
+            line = (uint32_t *) pxo;
+            line1 = (uint32_t *)px;
 
-    px = pixels;
-    //uint8_t* line = (uint8_t*)pixels;
-    int alpha;
-    //line = (uint32_t*)pixels;
+            for (i = 0; i < info->width; i++) {
+                Pr[i][j] = 0;
+                Pg[i][j] = 0;
+                Pb[i][j] = 0;
 
-	for(j = 0; j < info->height; j++){
-            line = (uint32_t*)pixels;
-            //LOGD("Pixel value: %d!!\n", line[3]);
-            //line1 = (uint32_t*)pixels;
-            //line = (uint32_t*)((char*)pixels + j*info->stride);
-			for(i =0; i < info->width; i++){
-			   // pos = j*info->width+i;
-			    //extract the RGB values from the pixel
-			    //uint8_t value = *(line + i + j*info->stride);
-				r[i][j] = (int)((line[i] & 0x00FF0000) >> 16);
-				g[i][j] = (int)((line[i] & 0x0000FF00) >> 8);
-				b[i][j] = (int)(line[i] & 0x00000FF );
-				alpha = (int)((line[i] & 0xFF000000) >> 24);
-				line[i] = (((r[i][j] << 16) & 0x00FF0000) |
-                          ((g[i][j] << 8) & 0x0000FF00) |
-                          (b[i][j] & 0x000000FF)|
-                          ((alpha << 24) & 0xFF000000));
+                for (k = 0; k < size; k++) {
+                    xval = i - a1 + k;
 
-			}
-			pixels = ((char*)pixels + info->stride);
-			//line = (uint32_t*)((char*)line + info->stride);
-	}
+                    if (!(xval < 0 || xval >= info->width)) {
+                        r[xval][j] = ((line1[xval] & 0x00FF0000) >> 16);
+                        g[xval][j] = ((line1[xval] & 0x0000FF00) >> 8);
+                        b[xval][j] = (line1[xval] & 0x00000FF);
 
-
-	for(j = 0; j < info->height; j++){
-
-	            line = (uint32_t*)px;
-	            //line1 = (uint32_t*)pixels;
-	            //LOGD("line1: %u\n", line1[3]);
-                //LOGD("I am here3!!\n");
-    			for(i =0; i < info->width; i++){
-    			    //pos = j*info->width+i;
-                    Pr[i][j] =0;
-                    Pg[i][j]=0;
-                    Pb[i][j]=0;
-
-                    for (k = 0; k < size; k++) {
-                        xval = i - a1 + k;
-
-                        if (!(xval < 0 || xval >= info->width)) {
-                            //LOGD("I am here4!!\n");
-
-                            //r[xval][j] = ((line[xval] & 0x00FF0000) >> 16);
-                            //g[xval][j] = ((line[xval] & 0x0000FF00) >> 8);
-                            //b[xval][j] = (line[xval] & 0x00000FF);
-
-                            Pr[i][j] += r[xval][j];
-                            Pg[i][j] += g[xval][j];
-                            Pb[i][j] += b[xval][j];
-
-                        }
-
+                        Pr[i][j] += r[xval][j];
+                        Pg[i][j] += g[xval][j];
+                        Pb[i][j] += b[xval][j];
                     }
-                        Pr[i][j] /= size;
-                        Pg[i][j] /= size;
-                        Pb[i][j] /= size;
+                }
+                Pr[i][j] /= size;
+                Pg[i][j] /= size;
+                Pb[i][j] /= size;
 
-                        // set the new pixel back in
-                        line[i] =
+                // set the new pixel back in
+                line[i] =
                         (((Pr[i][j] << 16) & 0x00FF0000) |
-                        ((Pg[i][j] << 8) & 0x0000FF00) |
-                        (Pb[i][j] & 0x000000FF) |
-                        0xFF000000);
+                         ((Pg[i][j] << 8) & 0x0000FF00) |
+                         (Pb[i][j] & 0x000000FF) |
+                         (0xFF000000));
+            }
+            px = (char *) px + info->stride;
+            pxo = (char *) pxo + info->stride;
+        }
+    }else if(a0==1){
+        for (j = 0; j < info->height; j++) {
+            line = (uint32_t *)(pxo)+(uint32_t)(info->width*j);
 
+            for (i = 0; i < info->width; i++) {
+                Pr[i][j] = 0;
+                Pg[i][j] = 0;
+                Pb[i][j] = 0;
+
+                for (k = 0; k < size; k++) {
+                    yval = j - a1 + k;
+
+                    if (!(yval < 0 || yval >= info->height)) {
+                        line1 = (uint32_t *)(px)+(uint32_t)(info->width*yval);
+
+                        r[i][yval] = ((line1[i] & 0x00FF0000) >> 16);
+                        g[i][yval] = ((line1[i] & 0x0000FF00) >> 8);
+                        b[i][yval] = (line1[i] & 0x00000FF);
+
+                        Pr[i][j] += r[i][yval];
+                        Pg[i][j] += g[i][yval];
+                        Pb[i][j] += b[i][yval];
                     }
+                }
+                Pr[i][j] /= size;
+                Pg[i][j] /= size;
+                Pb[i][j] /= size;
 
-    			px = (char*)px + info->stride;
-
-    	}
+                // set the new pixel back in
+                line[i] =
+                        (((Pr[i][j] << 16) & 0x00FF0000) |
+                         ((Pg[i][j] << 8) & 0x0000FF00) |
+                         (Pb[i][j] & 0x000000FF) |
+                         (0xFF000000));
+            }
+        }
+    }
 }
 
 
 
 JNIEXPORT void JNICALL Java_edu_asu_msrs_artcelerationlibrary_MotionBlur_getMotionBlur
-  (JNIEnv * env, jclass  jc, jint a0, jint a1, jobject bitmap, jint size)
+  (JNIEnv * env, jclass  jc, jint a0, jint a1, jobject input, jobject output)
   {
 
-      AndroidBitmapInfo  info;
+      AndroidBitmapInfo  info_input;
       int ret;
-      void* pixels;
+      void* pixels_input;
+      void* pixels_output;
 
-      LOGD("a0=%d, a1=%d, size =%d\n", a0, a1, size);
-      if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
+
+      // LOGD("a0=%d, a1=%d, size =%d\n", a0, a1, size);
+      if ((ret = AndroidBitmap_getInfo(env, input, &info_input)) < 0) {
               LOGE("AndroidBitmap_getInfo() failed ! error=%d", ret);
               return;
           }
+
+
       /*
       if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
           LOGE("Bitmap format is not RGBA_8888 !");
           return;
       }*/
 
-      if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
+      if ((ret = AndroidBitmap_lockPixels(env, input, &pixels_input)) < 0) {
           LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
       }
 
-      process(&info,pixels, a0, a1, size);
+        if ((ret = AndroidBitmap_lockPixels(env, output, &pixels_output)) < 0) {
+            LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
+        }
 
-      AndroidBitmap_unlockPixels(env, bitmap);
+      process(&info_input, pixels_input, pixels_output, a0, a1);
+
+      AndroidBitmap_unlockPixels(env, input);
+      AndroidBitmap_unlockPixels(env, output);
   }
 
 

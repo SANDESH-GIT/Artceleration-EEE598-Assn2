@@ -79,9 +79,12 @@ public class UnsharpMask implements Runnable {
         for (int i=0;i<w;i++) {
             for (int j = 0; j < h; j++) {
                 pix = input.getPixel(i,j);
+
                 r[i][j] = Color.red(pix);
                 g[i][j] = Color.green(pix);
                 b[i][j] = Color.blue(pix);
+
+
             }
         }
 
