@@ -34,7 +34,9 @@ public class SobelEdgeFilter implements Runnable {
         this.memoryFile = memoryFile;
     }
 
-
+    static {
+        System.loadLibrary("SobelEdgeFilterLib");
+    }
     /**
      * Run method includes all the transform logic for processing the input Bitmap image.
      * Writes the output image to the Memory File and shares the file descriptor of this file
@@ -47,13 +49,7 @@ public class SobelEdgeFilter implements Runnable {
 
         int a0=0; // Grx
         //a0 = 1; // Gry
-        a0 = 2; // Overall gradient
-
-        //vertical edge filter
-        int[][] sx=new int[][]{{-1,0,1}, {-2,0,2}, {-1,0,1}} ;
-
-        // horizontal edge filter
-        int[][] sy=new int[][]{{-1,-2,-1}, {0,0,0}, {1,2,1}} ;
+        a0 = 1; // Overall gradient
 
         // Image size, w-> width & h->height
         int w = input.getWidth();
@@ -62,6 +58,17 @@ public class SobelEdgeFilter implements Runnable {
         // Creating bitmap to be returned as a modified (mutable output bitmap)
         Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
         Bitmap grayScale = Bitmap.createBitmap(w,h,input.getConfig());
+
+
+        //vertical edge filter
+        int[][] sx=new int[][]{{-1,0,1}, {-2,0,2}, {-1,0,1}} ;
+
+        // horizontal edge filter
+        int[][] sy=new int[][]{{-1,-2,-1}, {0,0,0}, {1,2,1}} ;
+
+
+
+
 
         // Image represented by 4-bytes (4 channels as A,R, G, B)
         int r, g, b;
@@ -82,6 +89,7 @@ public class SobelEdgeFilter implements Runnable {
                 grayScale.setPixel(i,j,Color.argb(255,setP,setP,setP));
             }
         }
+
 
         for (int i=0;i<w;i++) {
             for (int j = 0; j < h; j++) {
@@ -138,6 +146,9 @@ public class SobelEdgeFilter implements Runnable {
             output=input; //TODO: Should return null as per assignment change
         }
 
+
+        //getSobelEdgeFilter(a0, input, grayScale, output);
+
         Log.d("Sobel Edge Filter","Done processing...!!!");
 
         try {
@@ -162,4 +173,6 @@ public class SobelEdgeFilter implements Runnable {
         }
 
     }
+
+    public native static void getSobelEdgeFilter(int a0, Bitmap input, Bitmap grayScale, Bitmap output);
 }
