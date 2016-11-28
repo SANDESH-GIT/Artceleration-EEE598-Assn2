@@ -54,7 +54,7 @@ public class MotionBlur implements Runnable {
         // radius
         int a1=8;
 
-        int size = 2*a1+1;
+        //int size = 2*a1+1;
 
         // Image size, w-> width & h->height
         int w = input.getWidth();

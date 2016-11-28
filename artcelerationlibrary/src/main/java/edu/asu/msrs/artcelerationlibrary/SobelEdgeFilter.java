@@ -66,6 +66,7 @@ public class SobelEdgeFilter implements Runnable {
         // Image represented by 4-bytes (4 channels as A,R, G, B)
         int r, g, b;
         int pix;
+        int setP;
 
         int[][] gg = new int[w][h]; // Green
 
@@ -77,8 +78,8 @@ public class SobelEdgeFilter implements Runnable {
                 r=(int)(Color.red(pix)* 0.2989);
                 g=(int)(Color.green(pix)* 0.5870);
                 b=(int)(Color.blue(pix)* 0.1140);
-
-                grayScale.setPixel(i,j,Color.argb(255,r,g,b));
+                setP=r+g+b;
+                grayScale.setPixel(i,j,Color.argb(255,setP,setP,setP));
             }
         }
 
