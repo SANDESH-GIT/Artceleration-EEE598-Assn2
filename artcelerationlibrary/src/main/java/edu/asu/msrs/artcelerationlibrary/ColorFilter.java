@@ -92,7 +92,7 @@ public class ColorFilter implements Runnable {
         int[] arr={20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220};
 
         // TODO: conditions on p1 as arrangement in increasing order otherwise return null
-
+        /*
         // Slopes for red; when p0!=0 and p6!=255
         if (arr[0]!=0 && arr[6]!=255) {
             Rm1 = ((float) arr[1] / arr[0]);
@@ -344,8 +344,9 @@ public class ColorFilter implements Runnable {
 
                 output.setPixel(i,j,Color.argb(255,r,g,b));
             }
-        }
+        }*/
 
+        getColorFilter(arr, input);
         //TODO: Should return null if arguments passed are not proper
 
         Log.d("Color filter","Done processing...!!!");
@@ -372,4 +373,5 @@ public class ColorFilter implements Runnable {
         }
 
     }
+    public native static void getColorFilter(int a[], Bitmap img);
 }
