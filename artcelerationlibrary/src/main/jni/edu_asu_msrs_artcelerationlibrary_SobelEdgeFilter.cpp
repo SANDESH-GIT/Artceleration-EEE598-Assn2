@@ -15,8 +15,8 @@
 using namespace std;
 
 static void process(AndroidBitmapInfo* info, void* input, void* gray, void* output,int a0){
-            uint32_t* line;
-            uint32_t* line1;
+            uint8_t* line;
+            uint8_t* line1;
 
             void* pxi = input;
             void* pxg = gray;
@@ -36,28 +36,70 @@ static void process(AndroidBitmapInfo* info, void* input, void* gray, void* outp
             int h = info->height;
             int gg[w][h]; // Green
 
-            uint8x8_t ascale = vdup_n_u8(1);
-            uint8x8_t rscale = vdup_n_u8(77);
-            uint8x8_t gscale = vdup_n_u8(151);
-            uint8x8_t bscale = vdup_n_u8(28);
+                        uint8x8_t ascale = vdup_n_u8(255);
+                        uint8x8_t rscale = vdup_n_u8(77);
+                        uint8x8_t gscale = vdup_n_u8(151);
+                        uint8x8_t bscale = vdup_n_u8(28);
+
+                        w = w/8;
+                        for(i=0; i< h; i++){
+                            line = (uint8_t*)pxg;
+                            line1 = (uint8_t*)pxi;
+                            for(j=0; j< w; j++){
+                                uint16x8_t temp;
+                                uint8x8x4_t values = vld4_u8(line1);
+                                uint8x8_t res;
+                                //temp = vmull_u8(values.val[0], ascale);
+                                temp = vmull_u8(values.val[1], rscale);
+                                temp = vmlal_u8(temp, values.val[2], gscale);
+                                temp = vmlal_u8(temp, values.val[3], bscale);
+
+                                res = vshrn_n_u16(temp, 8);
+                                vst1_u8(line, res);
+                                //vst1_u32(line, ascale);
+                                //vst1_u8(line+8, res);
+                                //vst1_u8(line+16, res);
+                                //vst1_u8(line+24, res);
+                                //vst1_u8(line, res);
+                                //pix=input.getPixel(i,j); // getPixel returns an integer value of the color of pixel
+                                line += 8;
+                                line1 += 8*4;
+                                // Filtering for every channel a,r,g,b
+                                //r=(int)(Color.red(pix)* 0.2989);
+                                //g=(int)(Color.green(pix)* 0.5870);
+                                //b=(int)(Color.blue(pix)* 0.1140);
+
+                                //grayScale.setPixel(i,j,Color.argb(255,r,g,b));
+                            }
+                            pxg = (char*) pxg + info->stride;
+                            pxi = (char*) pxi + info->stride;
+                        }
             /*
-            h = h/8;
-            for(i=0; i< w; i++){
-                line = (uint8_t*)pxg;
-                line1 = (uint8_t*)pxi;
-                for(j=0; j< h; j++){
-                    uint16x8_t temp;
-                    uint8x8x4_t values = vld4_u8(line1);
-                    uint8x8_t res;
-                    temp = vmull_u8(values.val[0], ascale);
-                    temp = vmlal_u8(temp, values.val[1], rscale);
-                    temp = vmlal_u8(temp, values.val[2], gscale);
-                    temp = vmlal_u8(temp, values.val[3], bscale);
+            uint32x2_t ascale = vdup_n_u32(8);
+            uint32x2_t rscale = vdup_n_u32(2);
+            uint32x2_t gscale = vdup_n_u32(5);
+            uint32x2_t bscale = vdup_n_u32(1);
 
-                    res = vshrn_n_u16(temp, 8);
-                    vst1_u8(line, res);
+            w = w/2;
+            for(i=0; i< h; i++){
+                line = (uint32_t*)pxg;
+                line1 = (uint32_t*)pxi;
+                LOGD("I am here1\n");
+                for(j=0; j< w; j++){
+                    uint64x2_t temp;
+                    uint32x2x4_t values = vld4_u32(line1);
+                    uint32x2_t res;
+                    temp = vmull_u32(values.val[0], ascale);
+                    temp = vmlal_u32(temp, values.val[1], rscale);
+                    temp = vmlal_u32(temp, values.val[2], gscale);
+                    temp = vmlal_u32(temp, values.val[3], bscale);
+
+                    res = vshrn_n_u64(temp, 32);
+                    res = vshrn_n_u32(res, 8);
+                    vst1_u32(line, res);
                     //pix=input.getPixel(i,j); // getPixel returns an integer value of the color of pixel
-
+                    line += 2;
+                    line1 += 2;
                     // Filtering for every channel a,r,g,b
                     //r=(int)(Color.red(pix)* 0.2989);
                     //g=(int)(Color.green(pix)* 0.5870);
@@ -67,8 +109,9 @@ static void process(AndroidBitmapInfo* info, void* input, void* gray, void* outp
                 }
                 pxg = (char*) pxg + info->stride;
                 pxi = (char*) pxi + info->stride;
-            }
-            */
+            }*/
+            /*
+            int value;
             for(int j=0; j<h; j++){
                 line = (uint32_t*)pxg;
                 line1 = (uint32_t*)pxi;
@@ -79,11 +122,11 @@ static void process(AndroidBitmapInfo* info, void* input, void* gray, void* outp
                             r = ((int)((line1[i] & 0x00FF0000)* 0.2989) >> 16);
                             g = ((int)((line1[i] & 0x0000FF00)* 0.5870) >> 8);
                             b = (int)((line1[i] & 0x00000FF)* 0.1140);
-
+                            value = r+g+b;
                             line[i] =
-                            (((r << 16) & 0x00FF0000) |
-                            ((g << 8) & 0x0000FF00) |
-                            (b & 0x000000FF)|
+                            (((value << 16) & 0x00FF0000) |
+                            ((value << 8) & 0x0000FF00) |
+                            (value & 0x000000FF)|
                             0xFF000000);
                         }
                         pxg = (char*) pxg + info->stride;

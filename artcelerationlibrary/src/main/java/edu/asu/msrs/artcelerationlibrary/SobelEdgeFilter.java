@@ -68,7 +68,7 @@ public class SobelEdgeFilter implements Runnable {
 
 
 
-
+        /*
 
         // Image represented by 4-bytes (4 channels as A,R, G, B)
         int r, g, b;
@@ -146,14 +146,14 @@ public class SobelEdgeFilter implements Runnable {
             output=input; //TODO: Should return null as per assignment change
         }
 
-
-        //getSobelEdgeFilter(a0, input, grayScale, output);
+        */
+        getSobelEdgeFilter(a0, input, grayScale, output);
 
         Log.d("Sobel Edge Filter","Done processing...!!!");
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            output.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            grayScale.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             byte[] oparray = outputStream.toByteArray();
             memoryFile.getOutputStream().write(oparray);
 
