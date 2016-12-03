@@ -4,6 +4,7 @@
 /* Header for class edu_asu_msrs_artcelerationlibrary_ColorFilter */
 
 using namespace std;
+
 #ifndef _Included_edu_asu_msrs_artcelerationlibrary_ColorFilter
 #define _Included_edu_asu_msrs_artcelerationlibrary_ColorFilter
 #ifdef __cplusplus
@@ -15,7 +16,7 @@ extern "C" {
  * Signature: ([ILandroid/graphics/Bitmap;)V
  */
 JNIEXPORT void JNICALL Java_edu_asu_msrs_artcelerationlibrary_ColorFilter_getColorFilter
-  (JNIEnv *, jclass, jintArray, jobject);
+  (JNIEnv *, jclass, jintArray, jobject, jobject);
 
 #ifdef __cplusplus
 }

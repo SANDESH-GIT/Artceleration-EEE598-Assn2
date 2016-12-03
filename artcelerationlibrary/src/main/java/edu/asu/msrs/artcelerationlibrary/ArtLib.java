@@ -73,17 +73,18 @@ public class ArtLib {
 
     // List of transform options
     public String[] getTransformsArray(){
-        String[] transforms = {"Unsharp Mask", "Gaussian Blur", "Color Filter", "Sobel Edge Filter", "Motion Blur"};
+        String[] transforms = {"Gaussian Blur", "Unsharp Mask", "Color Filter", "Sobel Edge Filter", "Motion Blur"};
         return transforms;
     }
 
     public TransformTest[] getTestsArray(){
         TransformTest[] transforms = new TransformTest[5];
-        transforms[0]=new TransformTest(0, new int[]{1,2,3}, new float[]{0.1f, 0.2f, 0.3f});
-        transforms[1]=new TransformTest(1, new int[]{11,22,33}, new float[]{0.3f, 0.2f, 0.3f});
-        transforms[2]=new TransformTest(2, new int[]{51,42,33}, new float[]{0.5f, 0.6f, 0.3f});
-        transforms[3]=new TransformTest(3, new int[]{51,42,33}, new float[]{0.5f, 0.6f, 0.3f});
-        transforms[4]=new TransformTest(4, new int[]{51,42,33}, new float[]{0.5f, 0.6f, 0.3f});
+        transforms[0]=new TransformTest(0, new int[]{5,2,3}, new float[]{2.0f, 0.2f, 0.3f});
+        transforms[1]=new TransformTest(1, new int[]{12,22,33}, new float[]{2.0f, 0.1f, 0.3f});
+        transforms[2]=new TransformTest(2, new int[]{20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220}, new float[]{});//0.5f, 0.6f, 0.3f});
+        transforms[3]=new TransformTest(3, new int[]{2,42,33}, new float[]{0.5f, 0.6f, 0.3f});
+        transforms[4]=new TransformTest(4, new int[]{1,8,33}, new float[]{0.5f, 0.6f, 0.3f});
+
         return transforms;
     }
 
@@ -95,7 +96,46 @@ public class ArtLib {
     // requestTransform method is invoked by the application having input parameter as Bitmap input image to be processed.
     public boolean requestTransform(Bitmap img, int index, int[] intArgs, float[] floatArgs){
         MemoryFile memoryFile = null;
+        if(intArgs==null) return false;
+        int intlen = intArgs.length;
+        int floatlen;
         try {
+            switch (index){
+                case 0:
+                    if (floatArgs==null) return false;
+                    floatlen=floatArgs.length;
+                    if (intlen<1 || floatlen<1) return false;
+                    if (intArgs[0]<1 || floatArgs[0]<=0) return false;
+                    break;
+                case 1:
+                    if (floatArgs==null) return false;
+                    floatlen=floatArgs.length;
+                    if (intlen<1 || floatlen<2) return false;
+                    if (intArgs[0]<1 || floatArgs[0]<=0 || floatArgs[1]<=0) return false;
+                    break;
+                case 2:
+                    if (intlen<24) return false;
+                    int i, temp=intArgs[0];
+                    for(i=0; i<24; i++){
+                        if(intArgs[i]<0 || intArgs[i]>255) return false;
+                        if(i%8==0) temp=intArgs[i];
+                        if(i%2==0 && i%8!=0){
+                            if(temp>=intArgs[i]) return false;
+                            temp=intArgs[i];
+                        }
+                    }
+                    break;
+                case 3:
+                    if (intlen<1) return false;
+                    if (intArgs[0]>2 || intArgs[0]<0) return false;
+                    break;
+                case 4:
+                    if (intlen<2) return false;
+                    if (intArgs[0]>1 || intArgs[0]<0 || intArgs[1]<1) return false;
+                    break;
+                default: return false;
+
+            }
             queue.add(requestNo);
             int size = 0;
 
@@ -113,6 +153,8 @@ public class ArtLib {
 
             // Sending Parcelable file descriptor to the service in a bundle
             data.putParcelable("PFD", fd);
+            data.putIntArray("intArgs", intArgs);
+            data.putFloatArray("floatArgs", floatArgs);
 
             /**
              * message to be sent to the service with parameter as index of transform, size of bitmap for memoryfile creation on server

@@ -25,13 +25,14 @@ public class MotionBlur implements Runnable {
     private Messenger messenger;
     private int requestNo;
     private MemoryFile memoryFile;
+    private int intArgs[];
 
-
-    MotionBlur(Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile) {
+    MotionBlur(Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile, int[] intArgs) {
         this.messenger = messenger;
         this.input = input;
         this.requestNo = requestNo;
         this.memoryFile = memoryFile;
+        this.intArgs =intArgs;
     }
 
     static {
@@ -44,15 +45,14 @@ public class MotionBlur implements Runnable {
      */
     @Override
     public void run() {
-
-        // TODO transform Logic
         Log.d("fd", "Motion Blur!");
 
         // a0=0-> Horizontal motion blur; a0=1 -> Vertical motion blur
-        int a0 = 0;
-
+        //int a0 = 0;
+        int a0 = intArgs[0];
         // radius
-        int a1=8;
+        //int a1 = 8;
+        int a1=intArgs[1];
 
         //int size = 2*a1+1;
 
@@ -121,8 +121,6 @@ public class MotionBlur implements Runnable {
                     output.setPixel(i, j, Color.argb(255, Pr[i][j], Pg[i][j], Pb[i][j]));
                 }
             }
-        }else{
-            output=input; //TODO: Should return null as per assignment change
         }
 */
 

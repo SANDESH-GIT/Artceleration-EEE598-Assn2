@@ -25,13 +25,14 @@ public class SobelEdgeFilter implements Runnable {
     private Messenger messenger;
     private int requestNo;
     private MemoryFile memoryFile;
+    private int intArgs[];
 
-
-    SobelEdgeFilter(Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile) {
+    SobelEdgeFilter(Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile, int[] intArgs) {
         this.messenger = messenger;
         this.input = input;
         this.requestNo = requestNo;
         this.memoryFile = memoryFile;
+        this.intArgs =intArgs;
     }
 
     static {
@@ -44,12 +45,12 @@ public class SobelEdgeFilter implements Runnable {
      */
     @Override
     public void run() {
-        // TODO transform Logic
         Log.d("fd", "SobelEdge Filter!");
 
-        int a0=0; // Grx
+        //int a0=0; // Grx
+        int a0 = intArgs[0];
         //a0 = 1; // Gry
-        a0 = 1; // Overall gradient
+        //a0 = 0; // Overall gradient
 
         // Image size, w-> width & h->height
         int w = input.getWidth();
@@ -59,16 +60,12 @@ public class SobelEdgeFilter implements Runnable {
         Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
         Bitmap grayScale = Bitmap.createBitmap(w,h,input.getConfig());
 
-
+        /*
         //vertical edge filter
         int[][] sx=new int[][]{{-1,0,1}, {-2,0,2}, {-1,0,1}} ;
 
         // horizontal edge filter
         int[][] sy=new int[][]{{-1,-2,-1}, {0,0,0}, {1,2,1}} ;
-
-
-
-        /*
 
         // Image represented by 4-bytes (4 channels as A,R, G, B)
         int r, g, b;
@@ -142,18 +139,16 @@ public class SobelEdgeFilter implements Runnable {
                     output.setPixel(i, j , Color.argb(255, Gr, Gr, Gr));
                 }
             }
-        }else{
-            output=input; //TODO: Should return null as per assignment change
         }
-
         */
+
         getSobelEdgeFilter(a0, input, grayScale, output);
 
         Log.d("Sobel Edge Filter","Done processing...!!!");
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            grayScale.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            output.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             byte[] oparray = outputStream.toByteArray();
             memoryFile.getOutputStream().write(oparray);
 

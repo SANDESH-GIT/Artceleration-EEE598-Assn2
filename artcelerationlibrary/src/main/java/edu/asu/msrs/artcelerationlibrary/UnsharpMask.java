@@ -25,15 +25,22 @@ public class UnsharpMask implements Runnable {
     private Messenger messenger;
     private int requestNo;
     private MemoryFile memoryFile;
+    private int intArgs[];
+    private float floatArgs[];
 
 
-    UnsharpMask(Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile) {
+    UnsharpMask(Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile,int[] intArgs, float[] floatArgs) {
         this.messenger = messenger;
         this.input = input;
         this.requestNo = requestNo;
         this.memoryFile = memoryFile;
+        this.intArgs =intArgs;
+        this.floatArgs = floatArgs;
     }
 
+    static {
+        System.loadLibrary("UnsharpMaskLib");
+    }
 
     /**
      * Run method includes all the transform logic for processing the input Bitmap image.
@@ -42,13 +49,15 @@ public class UnsharpMask implements Runnable {
      */
     @Override
     public void run() {
-        // TODO transform Logic
         Log.d("fd", "Unsharp Mask!");
 
-        int rad = 12;
-        float sd = 2f; // f0 or b0
-        float f1 = 0.1f;
-        int size = 2*rad+1;
+        //int a0 = 12;
+        int a0 = intArgs[0];
+        //float b0 = 2f; // f0 or b0
+        float b0 = floatArgs[0];
+        //float b1 = 0.1f;
+        float b1 = floatArgs[1];
+        // int size = 2*a0+1;
 
         // Image size, w-> width & h->height
         int w = input.getWidth();
@@ -57,7 +66,7 @@ public class UnsharpMask implements Runnable {
         // Creating bitmap to be returned as a modified (mutable output bitmap)
         Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
         //Bitmap q = Bitmap.createBitmap(w,h,input.getConfig());
-
+        /*
         float[] G = new float[size];
         float[][] qr = new float[w][h];
         float[][] qg = new float[w][h];
@@ -70,9 +79,9 @@ public class UnsharpMask implements Runnable {
         int[][] b = new int[w][h]; // Blue
         int pix;
 
-        // TODO: Remove pow and add simple multiplication
+
         for(int i=0; i<size; i++){
-            G[i]= (float) (Math.exp(-((i-rad)*(i-rad))/(2*sd*sd))/Math.sqrt(2*(Math.PI)*sd*sd));
+            G[i]= (float) (Math.exp(-((i-a0)*(i-a0))/(2*b0*b0))/Math.sqrt(2*(Math.PI)*b0*b0));
             //Log.d("Unsharp,Gaussian Blur: ", "Calculating kernel"+G[i]);
         }
 
@@ -91,7 +100,7 @@ public class UnsharpMask implements Runnable {
         for (int i=0;i<w;i++) {
             for (int j = 0; j < h; j++) {
                 for (int k=0;k<size;k++) {
-                    int xval = i-rad+k;
+                    int xval = i-a0+k;
                     if(!(xval<0 || xval>=w)){
                         qr[i][j] += G[k] * r[xval][j];
                         qg[i][j] += G[k] * g[xval][j];
@@ -104,7 +113,7 @@ public class UnsharpMask implements Runnable {
         for (int i=0;i<w;i++) {
             for (int j = 0; j < h; j++) {
                 for (int k=0;k<size;k++) {
-                    int yval = j-rad+k;
+                    int yval = j-a0+k;
                     if(!(yval<0 || yval>=h)){
                         Pr[i][j] += G[k] * qr[i][yval];
                         Pg[i][j] += G[k] * qg[i][yval];
@@ -112,15 +121,15 @@ public class UnsharpMask implements Runnable {
                         //Log.d("Gaussian Blur","One pixel modified");
                     }
                 }
-                Pr[i][j] = r[i][j] + (int)(f1*(r[i][j] -  Pr[i][j]));
-                Pg[i][j] = g[i][j] + (int)(f1*(g[i][j] -  Pg[i][j]));
-                Pb[i][j] = b[i][j] + (int)(f1*(b[i][j] -  Pb[i][j]));
+                Pr[i][j] = r[i][j] + (int)(b1*(r[i][j] -  Pr[i][j]));
+                Pg[i][j] = g[i][j] + (int)(b1*(g[i][j] -  Pg[i][j]));
+                Pb[i][j] = b[i][j] + (int)(b1*(b[i][j] -  Pb[i][j]));
                 output.setPixel(i,j,Color.argb(255,Pr[i][j],Pg[i][j],Pb[i][j]));
             }
         }
+        */
 
-        //TODO: Should return null if arguments passed are not proper
-
+        getUnsharpMask(a0, b0, b1, input, output);
         Log.d("Unsharp mask","Done processing...!!!");
 
         try {
@@ -145,4 +154,6 @@ public class UnsharpMask implements Runnable {
         }
 
     }
+
+    public native static void getUnsharpMask(int a0, float b0, float b1, Bitmap input,Bitmap output);
 }

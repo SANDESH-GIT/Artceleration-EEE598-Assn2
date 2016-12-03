@@ -25,13 +25,14 @@ public class ColorFilter implements Runnable {
     private Messenger messenger;
     private int requestNo;
     private MemoryFile memoryFile;
+    private int intArgs[];
 
-
-    ColorFilter(Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile) {
+    ColorFilter(Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile, int[] intArgs) {
         this.messenger = messenger;
         this.input = input;
         this.requestNo = requestNo;
         this.memoryFile = memoryFile;
+        this.intArgs =intArgs;
     }
 
     static {
@@ -44,7 +45,6 @@ public class ColorFilter implements Runnable {
      */
     @Override
     public void run() {
-        // TODO transform Logic
         Log.d("fd", "Color Filter!");
 
         // Image size, w-> width & h->height
@@ -53,7 +53,7 @@ public class ColorFilter implements Runnable {
 
         // Creating bitmap to be returned as a modified (mutable output bitmap)
         Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
-
+        /*
         // Image represented by 4-bytes (4 channels as A,R, G, B)
         int r, g, b;
         int pix;
@@ -91,9 +91,7 @@ public class ColorFilter implements Runnable {
         float Bc5 = 0;
         float Bm5 = 0;
 
-        int[] arr={20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220};
-
-        // TODO: conditions on p1 as arrangement in increasing order otherwise return null
+        //int[] arr={20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220};
 
         // Slopes for red; when p0!=0 and p6!=255
         if (arr[0]!=0 && arr[6]!=255) {
@@ -347,9 +345,8 @@ public class ColorFilter implements Runnable {
                 output.setPixel(i,j,Color.argb(255,r,g,b));
             }
         }
-
-        getColorFilter(arr, input);
-        //TODO: Should return null if arguments passed are not proper
+        */
+        getColorFilter(intArgs, input, output);
 
         Log.d("Color filter","Done processing...!!!");
 
@@ -375,5 +372,5 @@ public class ColorFilter implements Runnable {
         }
 
     }
-    public native static void getColorFilter(int a[], Bitmap img);
+    public native static void getColorFilter(int a[], Bitmap input, Bitmap output);
 }

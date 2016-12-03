@@ -15,8 +15,8 @@
 using namespace std;
 
 static void process(AndroidBitmapInfo* info, void* input, void* gray, void* output,int a0){
-            uint8_t* line;
-            uint8_t* line1;
+            uint32_t* line;
+            uint32_t* line1;
 
             void* pxi = input;
             void* pxg = gray;
@@ -28,13 +28,22 @@ static void process(AndroidBitmapInfo* info, void* input, void* gray, void* outp
             // horizontal edge filter
             int sy[3][3] = {{-1,-2,-1}, {0,0,0}, {1,2,1}} ;
 
+
             // Image represented by 4-bytes (4 channels as A,R, G, B)
             int r, g, b;
             int pix;
             int i, j, k;
             int w = info->width;
             int h = info->height;
-            int gg[w][h]; // Green
+
+            // Green
+            int** gg = new int*[info->width];
+            //int gg[w][h];
+            for (i=0;i<info->width;i++){
+                    gg[i]=new int [info->height];
+            }
+
+            /* ARM NEON SIMD implementation
 
                         uint8x8_t ascale = vdup_n_u8(255);
                         uint8x8_t rscale = vdup_n_u8(77);
@@ -56,66 +65,22 @@ static void process(AndroidBitmapInfo* info, void* input, void* gray, void* outp
 
                                 res = vshrn_n_u16(temp, 8);
                                 vst1_u8(line, res);
-                                //vst1_u32(line, ascale);
-                                //vst1_u8(line+8, res);
-                                //vst1_u8(line+16, res);
-                                //vst1_u8(line+24, res);
-                                //vst1_u8(line, res);
-                                //pix=input.getPixel(i,j); // getPixel returns an integer value of the color of pixel
                                 line += 8;
                                 line1 += 8*4;
-                                // Filtering for every channel a,r,g,b
-                                //r=(int)(Color.red(pix)* 0.2989);
-                                //g=(int)(Color.green(pix)* 0.5870);
-                                //b=(int)(Color.blue(pix)* 0.1140);
 
                                 //grayScale.setPixel(i,j,Color.argb(255,r,g,b));
                             }
                             pxg = (char*) pxg + info->stride;
                             pxi = (char*) pxi + info->stride;
                         }
-            /*
-            uint32x2_t ascale = vdup_n_u32(8);
-            uint32x2_t rscale = vdup_n_u32(2);
-            uint32x2_t gscale = vdup_n_u32(5);
-            uint32x2_t bscale = vdup_n_u32(1);
 
-            w = w/2;
-            for(i=0; i< h; i++){
-                line = (uint32_t*)pxg;
-                line1 = (uint32_t*)pxi;
-                LOGD("I am here1\n");
-                for(j=0; j< w; j++){
-                    uint64x2_t temp;
-                    uint32x2x4_t values = vld4_u32(line1);
-                    uint32x2_t res;
-                    temp = vmull_u32(values.val[0], ascale);
-                    temp = vmlal_u32(temp, values.val[1], rscale);
-                    temp = vmlal_u32(temp, values.val[2], gscale);
-                    temp = vmlal_u32(temp, values.val[3], bscale);
+            */
 
-                    res = vshrn_n_u64(temp, 32);
-                    res = vshrn_n_u32(res, 8);
-                    vst1_u32(line, res);
-                    //pix=input.getPixel(i,j); // getPixel returns an integer value of the color of pixel
-                    line += 2;
-                    line1 += 2;
-                    // Filtering for every channel a,r,g,b
-                    //r=(int)(Color.red(pix)* 0.2989);
-                    //g=(int)(Color.green(pix)* 0.5870);
-                    //b=(int)(Color.blue(pix)* 0.1140);
-
-                    //grayScale.setPixel(i,j,Color.argb(255,r,g,b));
-                }
-                pxg = (char*) pxg + info->stride;
-                pxi = (char*) pxi + info->stride;
-            }*/
-            /*
             int value;
-            for(int j=0; j<h; j++){
+            for(j=0; j<h; j++){
                 line = (uint32_t*)pxg;
                 line1 = (uint32_t*)pxi;
-                        for(int i=0; i< w; i++){
+                        for(i=0; i< w; i++){
                             //pix=input.getPixel(i,j); // getPixel returns an integer value of the color of pixel
 
                             // Filtering for every channel a,r,g,b
@@ -128,48 +93,56 @@ static void process(AndroidBitmapInfo* info, void* input, void* gray, void* outp
                             ((value << 8) & 0x0000FF00) |
                             (value & 0x000000FF)|
                             0xFF000000);
+                            gg[i][j] = (line1[i] & 0x0000FF00) >> 8;
                         }
                         pxg = (char*) pxg + info->stride;
                         pxi = (char*) pxi + info->stride;
                     }
-            /*
-            for (int i=0;i<w;i++) {
-                for (int j = 0; j < h; j++) {
-                    pix = grayScale.getPixel(i,j);
-                    gg[i][j] = Color.green(pix);
-                }
-            }
+
+
 
 
             if (a0==0){
-                int[][]Grx=new int[w][h];
-                for (int i=1;i<w-1;i++) {
-                    for (int j = 1; j < h-1; j++) {
+                int Grx[w][h];
+                for (j = 1; j < h-1; j++) {
+                    line = (uint32_t*)pxo;
+                    for (i=1;i<w-1;i++) {
 
                         Grx[i][j] = sx[0][0]*gg[i-1][j-1] + sx[1][0]*gg[i][j-1]+ sx[2][0]*gg[i+1][j-1]
                                 + sx[0][1]*gg[i-1][j]+ sx[1][1]*gg[i][j]+ sx[2][1]*gg[i+1][j]
                                 + sx[0][2]*gg[i-1][j+1] + sx[1][2]*gg[i][j+1]+ sx[2][2]*gg[i+1][j+1];
 
-                        output.setPixel(i, j , Color.argb(255, Grx[i][j], Grx[i][j], Grx[i][j]));
+                        line[i] =
+                        (((Grx[i][j] << 16) & 0x00FF0000) |
+                        ((Grx[i][j] << 8) & 0x0000FF00) |
+                        (Grx[i][j] & 0x000000FF)|
+                         0xFF000000);
                     }
+                    pxo = (char*) pxo + info->stride;
                 }
             }else if(a0==1){
-                int[][]Gry=new int[w][h];
-                for (int i=1;i<w-1;i++) {
-                    for (int j = 1; j < h-1; j++) {
-
+                int Gry[w][h];
+                for (j = 1; j < h-1; j++) {
+                        line = (uint32_t*)pxo;
+                        for (i=1;i<w-1;i++) {
                         Gry[i][j] =sy[0][0]*gg[i-1][j-1] + sy[1][0]*gg[i][j-1]+ sy[2][0]*gg[i+1][j-1]
                                 + sy[0][1]*gg[i-1][j]+ sy[1][1]*gg[i][j]+ sy[2][1]*gg[i+1][j]
                                 + sy[0][2]*gg[i-1][j+1] + sy[1][2]*gg[i][j+1]+ sy[2][2]*gg[i+1][j+1];
 
-                        output.setPixel(i, j , Color.argb(255, Gry[i][j], Gry[i][j], Gry[i][j]));
-                    }
+                        line[i] =
+                        (((Gry[i][j] << 16) & 0x00FF0000) |
+                        ((Gry[i][j] << 8) & 0x0000FF00) |
+                        (Gry[i][j] & 0x000000FF)|
+                        0xFF000000);
+                        }
+                        pxo = (char*) pxo + info->stride;
                 }
             }else if (a0 == 2){
-                int[][]Grx=new int[w][h];
-                int[][]Gry=new int[w][h];
-                for (int i=1;i<w-1;i++) {
-                    for (int j = 1; j < h-1; j++) {
+                int Grx[w][h];
+                int Gry[w][h];
+                for (j = 1; j < h-1; j++) {
+                        line = (uint32_t*)pxo;
+                        for (i=1;i<w-1;i++) {
 
                         Grx[i][j] = sx[0][0]*gg[i-1][j-1] + sx[1][0]*gg[i][j-1]+ sx[2][0]*gg[i+1][j-1]
                                 + sx[0][1]*gg[i-1][j]+ sx[1][1]*gg[i][j]+ sx[2][1]*gg[i+1][j]
@@ -179,13 +152,22 @@ static void process(AndroidBitmapInfo* info, void* input, void* gray, void* outp
                                 + sy[0][1]*gg[i-1][j]+ sy[1][1]*gg[i][j]+ sy[2][1]*gg[i+1][j]
                                 + sy[0][2]*gg[i-1][j+1] + sy[1][2]*gg[i][j+1]+ sy[2][2]*gg[i+1][j+1];
 
-                        int Gr = (int) Math.sqrt(Grx[i][j]*Grx[i][j] + Gry[i][j]*Gry[i][j]);
+                        int Gr = (int) sqrt(Grx[i][j]*Grx[i][j] + Gry[i][j]*Gry[i][j]);
 
-                        output.setPixel(i, j , Color.argb(255, Gr, Gr, Gr));
+                        line[i] =
+                        (((Gr << 16) & 0x00FF0000) |
+                        ((Gr << 8) & 0x0000FF00) |
+                        (Gr & 0x000000FF)|
+                        0xFF000000);
                     }
+                    pxo = (char*) pxo + info->stride;
                 }
             }
-            */
+
+            for (i=0;i<info->width;i++){
+                    delete [] gg[i];
+            }
+            delete [] gg;
 }
 
 
@@ -203,13 +185,6 @@ JNIEXPORT void JNICALL Java_edu_asu_msrs_artcelerationlibrary_SobelEdgeFilter_ge
                   LOGE("AndroidBitmap_getInfo() failed ! error=%d", ret);
                   return;
               }
-
-
-          /*
-          if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-              LOGE("Bitmap format is not RGBA_8888 !");
-              return;
-          }*/
 
           if ((ret = AndroidBitmap_lockPixels(env, input, &pixels_input)) < 0) {
               LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);

@@ -25,16 +25,22 @@ public class GaussianBlur implements Runnable {
     private Messenger messenger;
     private int requestNo;
     private MemoryFile memoryFile;
+    private int intArgs[];
+    private float floatArgs[];
 
-
-    GaussianBlur(Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile) {
+    GaussianBlur(Messenger messenger, Bitmap input, int requestNo, MemoryFile memoryFile, int[] intArgs, float[] floatArgs) {
         this.messenger = messenger;
         this.input = input;
         this.requestNo = requestNo;
         this.memoryFile = memoryFile;
+        this.intArgs =intArgs;
+        this.floatArgs = floatArgs;
     }
 
 
+    static {
+        System.loadLibrary("GaussianBlurLib");
+    }
     /**
      * Run method includes all the transform logic for processing the input Bitmap image.
      * Writes the output image to the Memory File and shares the file descriptor of this file
@@ -42,12 +48,13 @@ public class GaussianBlur implements Runnable {
      */
     @Override
     public void run() {
-        // TODO transform Logic
         Log.d("fd", "Gaussian Blur!");
 
-        int rad = 5;
-        float sd = 2f;
-        int size = 2*rad+1;
+        //int a0 = 5;
+        int a0 = intArgs[0];
+        //float b0 = 2f;
+        float b0 = floatArgs[0];
+        // int size = 2*a0+1;
 
         // Image size, w-> width & h->height
         int w = input.getWidth();
@@ -55,7 +62,7 @@ public class GaussianBlur implements Runnable {
 
         // Creating bitmap to be returned as a modified (mutable output bitmap)
         Bitmap output = Bitmap.createBitmap(w,h,input.getConfig());
-
+        /*
         float[] G = new float[size];
         float[][] qr = new float[w][h];
         float[][] qg = new float[w][h];
@@ -68,9 +75,8 @@ public class GaussianBlur implements Runnable {
         int[][] b = new int[w][h]; // Blue
         int pix;
 
-        // TODO: Remove pow and add simple multiplication
         for(int i=0; i<size; i++){
-            G[i]= (float) (Math.exp(-((i-rad)*(i-rad))/(2*sd*sd))/Math.sqrt(2*(Math.PI)*sd*sd));
+            G[i]= (float) (Math.exp(-((i-a0)*(i-a0))/(2*b0*b0))/Math.sqrt(2*(Math.PI)*b0*b0));
             //Log.d("Gaussian Blur: ", "Calculating kernel"+G[i]);
         }
 
@@ -86,7 +92,7 @@ public class GaussianBlur implements Runnable {
         for (int i=0;i<w;i++) {
             for (int j = 0; j < h; j++) {
                 for (int k=0;k<size;k++) {
-                    int xval = i-rad+k;
+                    int xval = i-a0+k;
                     if(!(xval<0 || xval>=w)){
                         qr[i][j] += G[k] * r[xval][j];
                         qg[i][j] += G[k] * g[xval][j];
@@ -99,7 +105,7 @@ public class GaussianBlur implements Runnable {
         for (int i=0;i<w;i++) {
             for (int j = 0; j < h; j++) {
                 for (int k=0;k<size;k++) {
-                    int yval = j-rad+k;
+                    int yval = j-a0+k;
                     if(!(yval<0 || yval>=h)){
                         Pr[i][j] += G[k] * qr[i][yval];
                         Pg[i][j] += G[k] * qg[i][yval];
@@ -111,9 +117,8 @@ public class GaussianBlur implements Runnable {
             }
         }
 
-
-        //TODO: Should return null if arguments passed are not proper
-
+        */
+        getGaussianBlur(a0, b0, input, output);
         Log.d("Gaussian Blur","Done processing...!!!");
 
         try {
@@ -138,4 +143,6 @@ public class GaussianBlur implements Runnable {
         }
 
     }
+
+    public native static void getGaussianBlur(int a0, float b0, Bitmap input,Bitmap output);
 }

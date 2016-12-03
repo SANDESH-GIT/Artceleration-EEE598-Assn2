@@ -2,7 +2,7 @@
 #include <jni.h>
 #include <stdio.h>
 
-/* Header for class edu_asu_msrs_artcelerationlibrary_MotionBlur */
+/* Header for class edu_asu_msrs_artcelerationlibrary_SobelEdgeFilter */
 
 using namespace std;
 

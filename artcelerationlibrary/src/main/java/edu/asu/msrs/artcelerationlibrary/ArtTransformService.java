@@ -35,7 +35,8 @@ public class ArtTransformService extends Service {
             Bundle data = new Bundle();
             data = msg.getData();
             ParcelFileDescriptor fd = (ParcelFileDescriptor)data.get("PFD");
-
+            int[] intArgs = (int[])(data.get("intArgs"));
+            float[] floatArgs = (float[])(data.get("floatArgs"));
             int type = msg.what;
             int size = msg.arg1;
             int requestNo = msg.arg2;
@@ -68,23 +69,23 @@ public class ArtTransformService extends Service {
             // Creates a new thread depending on the what parameter of the message received by library which specifies the Transform type
             switch (type){
                 case 0:
-                    Thread t = new Thread(new MotionBlur(m, bitmap,requestNo, serviceMemFile));
+                    Thread t = new Thread(new GaussianBlur(m, bitmap,requestNo, serviceMemFile, intArgs, floatArgs));
                     t.start();
                     break;
                 case 1:
-                    Thread t1 = new Thread(new GaussianBlur(m, bitmap,requestNo, serviceMemFile));
+                    Thread t1 = new Thread(new UnsharpMask(m, bitmap,requestNo, serviceMemFile, intArgs, floatArgs));
                     t1.start();
                     break;
                 case 2:
-                    Thread t2 = new Thread(new ColorFilter(m, bitmap,requestNo, serviceMemFile));
+                    Thread t2 = new Thread(new ColorFilter(m, bitmap,requestNo, serviceMemFile, intArgs));
                     t2.start();
                     break;
                 case 3:
-                    Thread t3 = new Thread(new SobelEdgeFilter(m, bitmap,requestNo, serviceMemFile));
+                    Thread t3 = new Thread(new SobelEdgeFilter(m, bitmap,requestNo, serviceMemFile, intArgs));
                     t3.start();
                     break;
                 case 4:
-                    Thread t4 = new Thread(new MotionBlur(m, bitmap,requestNo, serviceMemFile));
+                    Thread t4 = new Thread(new MotionBlur(m, bitmap,requestNo, serviceMemFile, intArgs));
                     t4.start();
                     break;
                 default:

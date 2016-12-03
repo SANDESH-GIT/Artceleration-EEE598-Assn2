@@ -23,9 +23,7 @@ static void process(AndroidBitmapInfo* info, void* input, void* output,int a0, i
 	int xval;
     int yval;
 
-    int r[info->width][info->height];
-    int g[info->width][info->height];
-    int b[info->width][info->height];
+    int r, g, b;
 
 	int Pr[info->width][info->height];
     int Pg[info->width][info->height];
@@ -45,13 +43,13 @@ static void process(AndroidBitmapInfo* info, void* input, void* output,int a0, i
                     xval = i - a1 + k;
 
                     if (!(xval < 0 || xval >= info->width)) {
-                        r[xval][j] = ((line1[xval] & 0x00FF0000) >> 16);
-                        g[xval][j] = ((line1[xval] & 0x0000FF00) >> 8);
-                        b[xval][j] = (line1[xval] & 0x00000FF);
+                        r = ((line1[xval] & 0x00FF0000) >> 16);
+                        g = ((line1[xval] & 0x0000FF00) >> 8);
+                        b = (line1[xval] & 0x00000FF);
 
-                        Pr[i][j] += r[xval][j];
-                        Pg[i][j] += g[xval][j];
-                        Pb[i][j] += b[xval][j];
+                        Pr[i][j] += r;
+                        Pg[i][j] += g;
+                        Pb[i][j] += b;
                     }
                 }
                 Pr[i][j] /= size;
@@ -83,13 +81,13 @@ static void process(AndroidBitmapInfo* info, void* input, void* output,int a0, i
                     if (!(yval < 0 || yval >= info->height)) {
                         line1 = (uint32_t *)(px)+(uint32_t)(info->width*yval);
 
-                        r[i][yval] = ((line1[i] & 0x00FF0000) >> 16);
-                        g[i][yval] = ((line1[i] & 0x0000FF00) >> 8);
-                        b[i][yval] = (line1[i] & 0x00000FF);
+                        r = ((line1[i] & 0x00FF0000) >> 16);
+                        g = ((line1[i] & 0x0000FF00) >> 8);
+                        b = (line1[i] & 0x00000FF);
 
-                        Pr[i][j] += r[i][yval];
-                        Pg[i][j] += g[i][yval];
-                        Pb[i][j] += b[i][yval];
+                        Pr[i][j] += r;
+                        Pg[i][j] += g;
+                        Pb[i][j] += b;
                     }
                 }
                 Pr[i][j] /= size;
@@ -107,8 +105,6 @@ static void process(AndroidBitmapInfo* info, void* input, void* output,int a0, i
     }
 }
 
-
-
 JNIEXPORT void JNICALL Java_edu_asu_msrs_artcelerationlibrary_MotionBlur_getMotionBlur
   (JNIEnv * env, jclass  jc, jint a0, jint a1, jobject input, jobject output)
   {
@@ -124,13 +120,6 @@ JNIEXPORT void JNICALL Java_edu_asu_msrs_artcelerationlibrary_MotionBlur_getMoti
               LOGE("AndroidBitmap_getInfo() failed ! error=%d", ret);
               return;
           }
-
-
-      /*
-      if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-          LOGE("Bitmap format is not RGBA_8888 !");
-          return;
-      }*/
 
       if ((ret = AndroidBitmap_lockPixels(env, input, &pixels_input)) < 0) {
           LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
