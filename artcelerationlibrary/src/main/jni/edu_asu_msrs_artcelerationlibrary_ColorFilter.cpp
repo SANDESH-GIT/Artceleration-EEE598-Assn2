@@ -1,3 +1,8 @@
+/**
+ * This is native(C++) code for Color filter image transform.
+ * Each color channel is transformed as a mapping of set of input pixel on a set of output pixel values.
+ * Each color channel has 4 input values mapped to 4 output values.
+ */
 #include <edu_asu_msrs_artcelerationlibrary_ColorFilter.h>
 #include <time.h>
 #include <android/log.h>
@@ -11,8 +16,13 @@
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 
-
-
+/**
+ * This function performs the Color filter operation.
+ * @param info : info is a pointer to AndroidBitmapInfo which provides height and width of the bitmap.
+ * @param input : Pointer to input Bitmap.
+ * @param output : Pointer to resultant output transformed bitmap.
+ * @param arr[] : integer array for set of values of mapping for each channel.
+ */
 static void process(AndroidBitmapInfo* info, void* input, void* output, int arr[]){
         int i, j, k;
         uint32_t* line;
@@ -56,7 +66,8 @@ static void process(AndroidBitmapInfo* info, void* input, void* output, int arr[
         float Bc5 = 0;
         float Bm5 = 0;
 
-        // Slopes for red; when p0!=0 and p6!=255
+        // Using line Eqn:  y=mx+c
+        // Slopes and constant calculation for red
         if (arr[0]!=0 && arr[6]!=255) {
             Rm1 = ((float) arr[1] / arr[0]);
             Rm2 = ((float) arr[3] - arr[1]) / (arr[2] - arr[0]);
@@ -93,7 +104,7 @@ static void process(AndroidBitmapInfo* info, void* input, void* output, int arr[
             Rc4 = arr[5] - (Rm4 * arr[4]);
         }
 
-        // Slopes for green
+        // Slopes and constant calculation for green
         if (arr[8]!=0 && arr[14]!=255){
             Gm1 = ((float) arr[9] / arr[8]);
             Gm2 = ((float) arr[11] - arr[9]) / (arr[10] - arr[8]);
@@ -130,7 +141,7 @@ static void process(AndroidBitmapInfo* info, void* input, void* output, int arr[
             Gc4 = arr[13] - (Gm4 * arr[12]);
         }
 
-        // Slopes for blue
+        // Slopes and constants calculations for blue
         if (arr[16]!=0 && arr[22]!=255){
             Bm1 = ((float) arr[17] / arr[16]);
             Bm2 = ((float) arr[19] - arr[17]) / (arr[18] - arr[16]);
@@ -304,18 +315,24 @@ static void process(AndroidBitmapInfo* info, void* input, void* output, int arr[
                         b= (int) ((Bm4*b)+Bc4);
                     }
                 }
-
+                // Setting output pixel
                 line[i] =
                 (((r << 16) & 0x00FF0000) |
                 ((g << 8) & 0x0000FF00) |
                 (b & 0x000000FF) |
                 (0xFF000000));
             }
-            px = (char *) px + info->stride;
-            pxo = (char *) pxo + info->stride;
+            px = (char *) px + info->stride; // Moving to next row of input bitmap after processing current row.
+            pxo = (char *) pxo + info->stride; // Moving to next row of output bitmap after processing current row.
         }
 }
 
+/*
+ * JNI call for Color filter.
+ * @param array: Integer array consisting set of values for mapping.
+ * @param input: native equivalent of input bitmap.
+ * @param output: native equivalent of output bitmap.
+ */
 JNIEXPORT void JNICALL Java_edu_asu_msrs_artcelerationlibrary_ColorFilter_getColorFilter
   (JNIEnv * env, jclass  jc, jintArray array, jobject input, jobject output){
               AndroidBitmapInfo  info_input;
@@ -323,30 +340,33 @@ JNIEXPORT void JNICALL Java_edu_asu_msrs_artcelerationlibrary_ColorFilter_getCol
               void* pixels_input;
               void* pixels_output;
 
-
-              // LOGD("a0=%d, a1=%d, size =%d\n", a0, a1, size);
+              // Get info for input bitmap.
               if ((ret = AndroidBitmap_getInfo(env, input, &info_input)) < 0) {
                       LOGE("AndroidBitmap_getInfo() failed ! error=%d", ret);
                       return;
                   }
 
+              // Acquire a lock for input pixels.
               if ((ret = AndroidBitmap_lockPixels(env, input, &pixels_input)) < 0) {
                   LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
               }
 
+                // Acquire a lock for output pixels.
                 if ((ret = AndroidBitmap_lockPixels(env, output, &pixels_output)) < 0) {
                     LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
                 }
 
-
+              // Converting jintArray to jint.
               jint *inCArray = (env)->GetIntArrayElements(array, NULL);
               //if (NULL == inCArray) return NULL;
               jsize length = (env)->GetArrayLength(array);
 
+              // Call process function for transform.
               process(&info_input, pixels_input, pixels_output, inCArray);
 
               (env)->ReleaseIntArrayElements(array, inCArray, 0); // release resources
 
+              // Unlock pixels.
               AndroidBitmap_unlockPixels(env, input);
               AndroidBitmap_unlockPixels(env, output);
   }
