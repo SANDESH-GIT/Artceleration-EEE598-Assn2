@@ -49,6 +49,7 @@ public class SobelEdgeFilter implements Runnable {
 
         //int a0=0; // Grx
         int a0 = intArgs[0];
+
         //a0 = 1; // Gry
         //a0 = 0; // Overall gradient
 
@@ -104,7 +105,7 @@ public class SobelEdgeFilter implements Runnable {
                     Grx[i][j] = sx[0][0]*gg[i-1][j-1] + sx[1][0]*gg[i][j-1]+ sx[2][0]*gg[i+1][j-1]
                             + sx[0][1]*gg[i-1][j]+ sx[1][1]*gg[i][j]+ sx[2][1]*gg[i+1][j]
                             + sx[0][2]*gg[i-1][j+1] + sx[1][2]*gg[i][j+1]+ sx[2][2]*gg[i+1][j+1];
-
+                    Grx[i][j] =  Math.abs(Grx[i][j]);
                     output.setPixel(i, j , Color.argb(255, Grx[i][j], Grx[i][j], Grx[i][j]));
                 }
             }
@@ -116,7 +117,7 @@ public class SobelEdgeFilter implements Runnable {
                     Gry[i][j] =sy[0][0]*gg[i-1][j-1] + sy[1][0]*gg[i][j-1]+ sy[2][0]*gg[i+1][j-1]
                             + sy[0][1]*gg[i-1][j]+ sy[1][1]*gg[i][j]+ sy[2][1]*gg[i+1][j]
                             + sy[0][2]*gg[i-1][j+1] + sy[1][2]*gg[i][j+1]+ sy[2][2]*gg[i+1][j+1];
-
+                    Gry[i][j] =  Math.abs(Gry[i][j]);
                     output.setPixel(i, j , Color.argb(255, Gry[i][j], Gry[i][j], Gry[i][j]));
                 }
             }

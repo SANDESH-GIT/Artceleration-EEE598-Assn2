@@ -123,7 +123,7 @@ static void process(AndroidBitmapInfo* info, void* input, void* gray, void* outp
                         Grx[i][j] = sx[0][0]*gg[i-1][j-1] + sx[1][0]*gg[i][j-1]+ sx[2][0]*gg[i+1][j-1]
                                 + sx[0][1]*gg[i-1][j]+ sx[1][1]*gg[i][j]+ sx[2][1]*gg[i+1][j]
                                 + sx[0][2]*gg[i-1][j+1] + sx[1][2]*gg[i][j+1]+ sx[2][2]*gg[i+1][j+1];
-
+                         Grx[i][j] = abs(Grx[i][j]);
                         // Setting output pixel
                         line[i] =
                         (((Grx[i][j] << 16) & 0x00FF0000) |
@@ -146,6 +146,7 @@ static void process(AndroidBitmapInfo* info, void* input, void* gray, void* outp
                                 + sy[0][1]*gg[i-1][j]+ sy[1][1]*gg[i][j]+ sy[2][1]*gg[i+1][j]
                                 + sy[0][2]*gg[i-1][j+1] + sy[1][2]*gg[i][j+1]+ sy[2][2]*gg[i+1][j+1];
 
+                        Gry[i][j] = abs(Gry[i][j]);
                             // Setting output pixel
                         line[i] =
                         (((Gry[i][j] << 16) & 0x00FF0000) |

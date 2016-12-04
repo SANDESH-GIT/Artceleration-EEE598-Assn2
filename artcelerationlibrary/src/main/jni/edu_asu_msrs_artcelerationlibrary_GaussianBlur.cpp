@@ -1,3 +1,8 @@
+/**
+ * This is native(C++) code for Gaussian Blur image transform.
+ * Each output pixel should be a Gaussian‐weighted combination of nearby input pixel values.
+ * This transform requires radius and standard deviation for processing.
+ */
 #include <edu_asu_msrs_artcelerationlibrary_GaussianBlur.h>
 #include <time.h>
 #include <android/log.h>
@@ -13,7 +18,21 @@
 
 using namespace std;
 
-static void process(AndroidBitmapInfo* info, void* input, void* output,int a0, float b0){
+/**
+ * This function performs the Gaussian Blur operation.
+ * @param info
+ */
+
+
+/**
+ * This function performs the Gaussian Blur operation.
+ * @param info : info is a pointer to AndroidBitmapInfo which provides height and width of the bitmap.
+ * @param input : Pointer to input Bitmap.
+ * @param output : Pointer to resultant output transformed bitmap.
+ * @param a0 : first value of intArray arguments sent to requestTransform (radius).
+ * @param b0 : first value of floatArray arguments sent to requestTransform (Standard Deviation).
+ */
+static void process(AndroidBitmapInfo* info, void* input, void* output, int a0, float b0){
         int i, j, k;
         uint32_t* line;
         uint32_t* line1;
@@ -26,28 +45,33 @@ static void process(AndroidBitmapInfo* info, void* input, void* output,int a0, f
         int h = info->height;
         int r, g, b;
 
+        // Red, Blue, Green values of Output Pixel
     	int Pr[info->width][info->height];
         int Pg[info->width][info->height];
         int Pb[info->width][info->height];
 
         float G[size];
+
+        // Used for intermediate processing as per 2nd method mentioned to do Gaussian Blur
         float** qr = new float*[info->width];
         float** qg = new float*[info->width];
         float** qb = new float*[info->width];
 
+        // Allocation on heap memory
         for (i=0;i<info->width;i++){
             qr[i]=new float [info->height];
             qg[i]=new float [info->height];
             qb[i]=new float [info->height];
         }
 
+        // Generate Gaussian Weight Vector G(k)
         for(i=0; i<size; i++){
             G[i]= (float) (exp(-((i-a0)*(i-a0))/(2*b0*b0))/sqrt(2*(M_PI)*b0*b0));
-            //Log.d("Gaussian Blur: ", "Calculating kernel"+G[i]);
         }
 
+        // Calculating values for qr, qg, qb
         for (j = 0; j < h; j++) {
-            line1 = (uint32_t *)px;
+            line1 = (uint32_t *)px;   // Traversing input pixels
             for (i=0;i<w;i++) {
                 qr[i][j] = 0;
                 qg[i][j] = 0;
@@ -65,12 +89,12 @@ static void process(AndroidBitmapInfo* info, void* input, void* output,int a0, f
                     }
                 }
             }
-            px = (char *) px + info->stride;
+            px = (char *) px + info->stride; // Moving to next row of input bitmap after processing the current row.
         }
 
-
+        // Calculating values for Pr, Pg, Pb
         for (j = 0; j < h; j++) {
-            line = (uint32_t *)pxo;
+            line = (uint32_t *)pxo; // Traversing output pixels
             for (i=0;i<w;i++) {
                 Pr[i][j] = 0;
                 Pg[i][j] = 0;
@@ -90,9 +114,10 @@ static void process(AndroidBitmapInfo* info, void* input, void* output,int a0, f
                 (Pb[i][j] & 0x000000FF) |
                 (0xFF000000));
             }
-            pxo = (char *) pxo + info->stride;
+            pxo = (char *) pxo + info->stride;  // Moving to next row of output bitmap after processing the current row.
         }
 
+        // Releasing the memory allocated on heap
         for (i=0;i<info->width;i++){
             delete [] qr[i];
             delete [] qg[i];
@@ -104,6 +129,14 @@ static void process(AndroidBitmapInfo* info, void* input, void* output,int a0, f
 }
 
 
+
+/*
+ * JNI call for Gaussian Blur.
+ * @param a0 : first value of intArray arguments sent to requestTransform (radius).
+ * @param b0 : first value of floatArray arguments sent to requestTransform (Standard Deviation).
+ * @param input: native equivalent of input bitmap.
+ * @param output: native equivalent of output bitmap.
+ */
 JNIEXPORT void JNICALL Java_edu_asu_msrs_artcelerationlibrary_GaussianBlur_getGaussianBlur
   (JNIEnv * env, jclass jc, jint a0, jfloat b0, jobject input, jobject output){
               AndroidBitmapInfo  info_input;
@@ -112,22 +145,26 @@ JNIEXPORT void JNICALL Java_edu_asu_msrs_artcelerationlibrary_GaussianBlur_getGa
               void* pixels_output;
 
 
-              // LOGD("a0=%d, a1=%d, size =%d\n", a0, a1, size);
+              // Get info for input bitmap.
               if ((ret = AndroidBitmap_getInfo(env, input, &info_input)) < 0) {
                       LOGE("AndroidBitmap_getInfo() failed ! error=%d", ret);
                       return;
                   }
 
+              // Acquire a lock for input pixels.
               if ((ret = AndroidBitmap_lockPixels(env, input, &pixels_input)) < 0) {
                   LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
               }
 
+                // Acquire a lock for output pixels.
                 if ((ret = AndroidBitmap_lockPixels(env, output, &pixels_output)) < 0) {
                     LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
                 }
 
+              // Call process function for transform.
               process(&info_input, pixels_input, pixels_output, a0, b0);
 
+              // Unlock pixels.
               AndroidBitmap_unlockPixels(env, input);
               AndroidBitmap_unlockPixels(env, output);
   }

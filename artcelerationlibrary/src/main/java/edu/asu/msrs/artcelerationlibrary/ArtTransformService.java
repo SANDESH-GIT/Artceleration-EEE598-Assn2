@@ -40,7 +40,6 @@ public class ArtTransformService extends Service {
             int type = msg.what;
             int size = msg.arg1;
             int requestNo = msg.arg2;
-            Log.d("fd", "size:"+size);
 
             // To read the input bitmap image written to the Memory File in the library.
             ParcelFileDescriptor.AutoCloseInputStream isr = new ParcelFileDescriptor.AutoCloseInputStream(fd);
@@ -53,7 +52,6 @@ public class ArtTransformService extends Service {
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inMutable = true;
-            Log.d("fd", "bytes:"+b.length);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             Bitmap bitmap = Bitmap.createBitmap(BitmapFactory.decodeByteArray(b, 0, b.length, options));
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);

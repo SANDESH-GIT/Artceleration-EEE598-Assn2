@@ -83,7 +83,7 @@ public class ArtLib {
         transforms[1]=new TransformTest(1, new int[]{12,22,33}, new float[]{2.0f, 0.1f, 0.3f});
         transforms[2]=new TransformTest(2, new int[]{20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220,20,30,40,50,150,100,200,220}, new float[]{});//0.5f, 0.6f, 0.3f});
         transforms[3]=new TransformTest(3, new int[]{2,42,33}, new float[]{0.5f, 0.6f, 0.3f});
-        transforms[4]=new TransformTest(4, new int[]{1,8,33}, new float[]{0.5f, 0.6f, 0.3f});
+        transforms[4]=new TransformTest(4, new int[]{1,12,33}, new float[]{0.5f, 0.6f, 0.3f});
 
         return transforms;
     }
@@ -96,13 +96,16 @@ public class ArtLib {
     // requestTransform method is invoked by the application having input parameter as Bitmap input image to be processed.
     public boolean requestTransform(Bitmap img, int index, int[] intArgs, float[] floatArgs){
         MemoryFile memoryFile = null;
-        if(intArgs==null) return false;
-        int intlen = intArgs.length;
+
+        int intlen;
         int floatlen;
         try {
+            // Validation of input arguments.
             switch (index){
                 case 0:
+                    if(intArgs==null) return false;
                     if (floatArgs==null) return false;
+                    intlen = intArgs.length;
                     floatlen=floatArgs.length;
                     if (intlen<1 || floatlen<1) return false;
                     if (intArgs[0]<1 || floatArgs[0]<=0) return false;
@@ -110,10 +113,12 @@ public class ArtLib {
                 case 1:
                     if (floatArgs==null) return false;
                     floatlen=floatArgs.length;
-                    if (intlen<1 || floatlen<2) return false;
-                    if (intArgs[0]<1 || floatArgs[0]<=0 || floatArgs[1]<=0) return false;
+                    if (floatlen<2) return false;
+                    if (floatArgs[0]<=0 || floatArgs[1]<=0) return false;
                     break;
                 case 2:
+                    if(intArgs==null) return false;
+                    intlen = intArgs.length;
                     if (intlen<24) return false;
                     int i, temp=intArgs[0];
                     for(i=0; i<24; i++){
@@ -126,10 +131,14 @@ public class ArtLib {
                     }
                     break;
                 case 3:
+                    if(intArgs==null) return false;
+                    intlen = intArgs.length;
                     if (intlen<1) return false;
                     if (intArgs[0]>2 || intArgs[0]<0) return false;
                     break;
                 case 4:
+                    if(intArgs==null) return false;
+                    intlen = intArgs.length;
                     if (intlen<2) return false;
                     if (intArgs[0]>1 || intArgs[0]<0 || intArgs[1]<1) return false;
                     break;
@@ -141,7 +150,6 @@ public class ArtLib {
 
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             img.compress(Bitmap.CompressFormat.JPEG, 100, b);
-            Log.d("fd", "size:"+b.size());
             size = b.size();
             memoryFile = new MemoryFile("MyMemFile", size);
             ParcelFileDescriptor fd = MemoryFileUtil.getParcelFileDescriptor(memoryFile);
@@ -184,7 +192,6 @@ public class ArtLib {
         @Override
         public void handleMessage(Message msg) {
             int what = msg.what;
-            Log.d("clientSide", "what="+what);
             Bundle data = new Bundle();
             data = msg.getData();
 
@@ -192,7 +199,6 @@ public class ArtLib {
             ParcelFileDescriptor fd = (ParcelFileDescriptor)data.get("ClassPFD");
 
             int size = msg.arg1;
-            Log.d("fd", "size:"+size);
             ParcelFileDescriptor.AutoCloseInputStream isr = new ParcelFileDescriptor.AutoCloseInputStream(fd);
             final byte[] b = new byte[size];
             try {
@@ -205,7 +211,6 @@ public class ArtLib {
 
             // read the unique request number.
             final int requestNo = msg.arg2;
-            Log.d("fd", "outside requestNo:"+requestNo);
 
             // Multiple threads can check on their position at the head of the queue
             Thread t = new Thread(new Runnable() {

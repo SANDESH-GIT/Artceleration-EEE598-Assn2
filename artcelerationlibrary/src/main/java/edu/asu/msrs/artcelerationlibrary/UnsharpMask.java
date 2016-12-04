@@ -50,11 +50,10 @@ public class UnsharpMask implements Runnable {
     @Override
     public void run() {
         Log.d("fd", "Unsharp Mask!");
-
-        //int a0 = 12;
-        int a0 = intArgs[0];
+        int a0;
         //float b0 = 2f; // f0 or b0
         float b0 = floatArgs[0];
+        a0 = (int)(6*b0);
         //float b1 = 0.1f;
         float b1 = floatArgs[1];
         // int size = 2*a0+1;
